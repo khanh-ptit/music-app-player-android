@@ -83,6 +83,33 @@
         app:layout_constraintTop_toBottomOf="@id/playlist_section"
         android:orientation="horizontal" />
 
+    <!-- Nghệ sĩ Section -->
+    <TextView
+        android:id="@+id/singer_section"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:background="@android:color/transparent"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:text="Nghệ sĩ"
+        android:textColor="@color/colorText"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/playlist_section" />
+
+    <!-- Nghệ sĩ items (Make it scrollable) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/singerlist_recycler"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/singer_section"
+        android:orientation="horizontal" />
+
     <!-- Song list Section -->
     <TextView
         android:id="@+id/song_list_section"
@@ -96,7 +123,7 @@
         android:textColor="@color/colorText"
         android:textSize="18sp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/playlist_recycler" />
+        app:layout_constraintTop_toBottomOf="@id/singerlist_recycler" />
 
     <!-- Song list items (Make it scrollable) -->
     <androidx.recyclerview.widget.RecyclerView

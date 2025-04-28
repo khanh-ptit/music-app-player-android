@@ -7,17 +7,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.khanhleis11.appnghenhac_nhom3.R;
 import com.khanhleis11.appnghenhac_nhom3.models.Song;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder> {
 
-    private List<Song> songList; // Use List<Song> instead of List<String[]>
+    private List<Song> songList;
 
     public SongAdapter(List<Song> songList) {
         this.songList = songList;
@@ -32,9 +32,18 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull SongViewHolder holder, int position) {
-        Song song = songList.get(position); // Get Song object at the given position
-        holder.songName.setText(song.getTitle() + " - " + song.getArtist()); // Set Song title and artist
-        holder.songArt.setImageResource(song.getImageResource());  // Set the image resource
+        Song song = songList.get(position);
+        holder.songName.setText(song.getTitle());
+        holder.songArtist.setText(song.getSinger());
+
+        // Check if the URL is HTTP and replace it with HTTPS
+        String avatarUrl = song.getAvatar();
+        if (avatarUrl != null && avatarUrl.startsWith("http://")) {
+            avatarUrl = avatarUrl.replace("http://", "https://");
+        }
+
+        // Use Picasso to load the image using HTTPS URL
+        Picasso.get().load(avatarUrl).into(holder.songArt);
     }
 
     @Override
@@ -44,17 +53,14 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
 
     public static class SongViewHolder extends RecyclerView.ViewHolder {
 
-        CardView songCard;
-        TextView songName;
         ImageView songArt;
-        ImageView moreIcon;
+        TextView songName, songArtist;
 
         public SongViewHolder(@NonNull View itemView) {
             super(itemView);
-            songCard = itemView.findViewById(R.id.song_card);  // Reference the CardView by ID
-            songName = itemView.findViewById(R.id.song_name);
             songArt = itemView.findViewById(R.id.song_art);
-            moreIcon = itemView.findViewById(R.id.more_icon);
+            songName = itemView.findViewById(R.id.song_name);
+            songArtist = itemView.findViewById(R.id.song_artist);
         }
     }
 }

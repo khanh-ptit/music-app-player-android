@@ -33,7 +33,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
     public void onBindViewHolder(@NonNull PlaylistViewHolder holder, int position) {
         Song song = playlistItems.get(position);
         holder.playlistName.setText(song.getTitle());
-        holder.playlistArt.setImageResource(song.getImageResource());  // Ensure the image resource is correct
+//        holder.playlistArt.setImageResource(song.getImageResource());  // Ensure the image resource is correct
     }
 
     @Override
