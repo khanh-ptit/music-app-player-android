@@ -8,8 +8,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.khanhleis11.appnghenhac_nhom3.adapters.SongAdapter;
+import com.khanhleis11.appnghenhac_nhom3.adapters.SingerAdapter;
 import com.khanhleis11.appnghenhac_nhom3.models.Song;
 import com.khanhleis11.appnghenhac_nhom3.models.SongResponse;
+import com.khanhleis11.appnghenhac_nhom3.models.Singer;
+import com.khanhleis11.appnghenhac_nhom3.models.SingerResponse;
 import com.khanhleis11.appnghenhac_nhom3.api.ApiClient;
 import com.khanhleis11.appnghenhac_nhom3.api.RetrofitInstance;
 
@@ -23,24 +26,32 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView songListRecycler;
     private SongAdapter songAdapter;
+    private RecyclerView singerListRecycler;
+    private SingerAdapter singerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Setup RecyclerView for songs
         songListRecycler = findViewById(R.id.song_list_recycler);
         songListRecycler.setLayoutManager(new LinearLayoutManager(this));
 
+        // Setup RecyclerView for singers
+        singerListRecycler = findViewById(R.id.singerlist_recycler);
+        singerListRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+
         // Call API to get the song list
         ApiClient apiClient = RetrofitInstance.getRetrofitInstance().create(ApiClient.class);
-        Call<SongResponse> call = apiClient.getSongs();
 
-        call.enqueue(new Callback<SongResponse>() {
+        // Get Songs
+        Call<SongResponse> songCall = apiClient.getSongs();
+        songCall.enqueue(new Callback<SongResponse>() {
             @Override
             public void onResponse(Call<SongResponse> call, Response<SongResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<Song> songs = response.body().getSongs();  // Get songs from SongResponse
+                    List<Song> songs = response.body().getSongs();
                     songAdapter = new SongAdapter(songs);
                     songListRecycler.setAdapter(songAdapter);
                 } else {
@@ -50,6 +61,26 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<SongResponse> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Get Singers
+        Call<SingerResponse> singerCall = apiClient.getSingers();
+        singerCall.enqueue(new Callback<SingerResponse>() {
+            @Override
+            public void onResponse(Call<SingerResponse> call, Response<SingerResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Singer> singers = response.body().getSingers();
+                    singerAdapter = new SingerAdapter(singers);
+                    singerListRecycler.setAdapter(singerAdapter);
+                } else {
+                    Toast.makeText(MainActivity.this, "Failed to load singers", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SingerResponse> call, Throwable t) {
                 Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

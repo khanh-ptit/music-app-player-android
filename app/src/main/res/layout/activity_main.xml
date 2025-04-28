@@ -1,142 +1,143 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <!-- Header -->
-    <LinearLayout
-        android:id="@+id/header"
+    <!-- ScrollView chứa toàn bộ nội dung có thể cuộn -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="@android:color/transparent"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:weightSum="2">
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/mini_player">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:gravity="start|center_vertical"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:paddingBottom="100dp"
+            android:scrollbars="vertical">
 
-            <ImageView
-                android:id="@+id/logo"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/logo_app" />
+            <!-- Header -->
+            <LinearLayout
+                android:id="@+id/header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@android:color/transparent"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical"
+                android:weightSum="2">
 
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="start|center_vertical"
+                    android:background="@android:color/transparent">
+
+                    <ImageView
+                        android:id="@+id/logo"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@drawable/logo_app" />
+
+                    <TextView
+                        android:id="@+id/header_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="Gợi ý"
+                        android:textColor="@color/colorText"
+                        android:textSize="24sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="end|center_vertical"
+                    android:background="@android:color/transparent">
+
+                    <TextView
+                        android:id="@+id/search_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/fa_solid_900"
+                        android:text="\uf002"
+                        android:textColor="@color/colorText"
+                        android:textSize="24sp" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Playlist Section -->
             <TextView
-                android:id="@+id/header_title"
+                android:id="@+id/playlist_section"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:background="@android:color/transparent"
-                android:text="Gợi ý"
+                android:layout_marginTop="24dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:text="Danh sách phát"
                 android:textColor="@color/colorText"
-                android:textSize="24sp" />
+                android:textSize="18sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/playlist_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal" />
+
+            <!-- Singer Section -->
+            <TextView
+                android:id="@+id/singer_section"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:text="Nghệ sĩ nổi bật"
+                android:textColor="@color/colorText"
+                android:textSize="18sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/singerlist_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal" />
+
+
+            <!-- Song list Section -->
+            <TextView
+                android:id="@+id/song_list_section"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:text="Bài hát"
+                android:textColor="@color/colorText"
+                android:textSize="18sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/song_list_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
         </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
-        <TextView
-            android:id="@+id/search_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:fontFamily="@font/fa_solid_900"
-            android:gravity="end"
-            android:text="\uf002"
-            android:textColor="@color/colorText"
-            android:textSize="24sp" />
-    </LinearLayout>
-
-    <!-- Playlist Section -->
-    <TextView
-        android:id="@+id/playlist_section"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:background="@android:color/transparent"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:text="Danh sách phát"
-        android:textColor="@color/colorText"
-        android:textSize="18sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/header" />
-
-    <!-- Playlist items (Ensure it can scroll) -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/playlist_recycler"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:background="@android:color/transparent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/playlist_section"
-        android:orientation="horizontal" />
-
-    <!-- Nghệ sĩ Section -->
-    <TextView
-        android:id="@+id/singer_section"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:background="@android:color/transparent"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:text="Nghệ sĩ"
-        android:textColor="@color/colorText"
-        android:textSize="18sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/playlist_section" />
-
-    <!-- Nghệ sĩ items (Make it scrollable) -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/singerlist_recycler"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:background="@android:color/transparent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/singer_section"
-        android:orientation="horizontal" />
-
-    <!-- Song list Section -->
-    <TextView
-        android:id="@+id/song_list_section"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="@android:color/transparent"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:text="Bài hát"
-        android:textColor="@color/colorText"
-        android:textSize="18sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/singerlist_recycler" />
-
-    <!-- Song list items (Make it scrollable) -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/song_list_recycler"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:background="@android:color/transparent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/song_list_section" />
-
-    <!-- Mini player at the bottom -->
+    <!-- Mini player -->
     <LinearLayout
         android:id="@+id/mini_player"
         android:layout_width="match_parent"
@@ -162,10 +163,9 @@
             android:layout_gravity="center_vertical"
             android:layout_marginStart="16dp"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:ellipsize="end"
             android:gravity="start|center_vertical"
             android:singleLine="true"
+            android:ellipsize="end"
             android:text="Song Name"
             android:textColor="@android:color/white"
             android:textSize="16sp" />
@@ -176,7 +176,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginEnd="16dp"
-            android:background="@android:color/transparent"
             android:fontFamily="@font/fa_solid_900"
             android:text="\uf04b"
             android:textColor="@android:color/white"
@@ -188,7 +187,6 @@
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_marginBottom="0dp"
         android:background="@color/colorPrimary"
         android:gravity="center"
         android:orientation="horizontal"
@@ -198,7 +196,7 @@
 
         <TextView
             android:id="@+id/nav_home"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:fontFamily="@font/fa_solid_900"
@@ -207,26 +205,24 @@
             android:textColor="@android:color/white"
             android:textSize="20sp"
             android:background="?android:attr/selectableItemBackground"
-            android:padding="8dp"
-            android:layout_gravity="center"/>
+            android:padding="8dp" />
 
         <TextView
             android:id="@+id/nav_library"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
             android:layout_weight="1"
-            android:background="?android:attr/selectableItemBackground"
             android:fontFamily="@font/fa_solid_900"
             android:gravity="center"
-            android:padding="8dp"
             android:text="\uf02d"
             android:textColor="@android:color/white"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:background="?android:attr/selectableItemBackground"
+            android:padding="8dp" />
 
         <TextView
             android:id="@+id/nav_settings"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:fontFamily="@font/fa_solid_900"
@@ -235,8 +231,7 @@
             android:textColor="@android:color/white"
             android:textSize="20sp"
             android:background="?android:attr/selectableItemBackground"
-            android:padding="8dp"
-            android:layout_gravity="center"/>
+            android:padding="8dp" />
 
     </LinearLayout>
 
