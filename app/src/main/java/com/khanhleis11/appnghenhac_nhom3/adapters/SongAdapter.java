@@ -34,7 +34,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
     public void onBindViewHolder(@NonNull SongViewHolder holder, int position) {
         Song song = songList.get(position);
         holder.songName.setText(song.getTitle());
-        holder.songArtist.setText(song.getSinger());
+        holder.songArtist.setText(song.getSingerName());
 
         // Check if the URL is HTTP and replace it with HTTPS
         String avatarUrl = song.getAvatar();

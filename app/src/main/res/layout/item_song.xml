@@ -13,8 +13,7 @@
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:paddingRight="12dp"
-        android:paddingLeft="12dp"
-        >
+        android:paddingLeft="12dp">
 
         <ImageView
             android:id="@+id/song_art"
@@ -38,20 +37,37 @@
                 android:layout_height="wrap_content"
                 android:text="Song Title"
                 android:textColor="@color/colorText"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 android:gravity="center_horizontal"
                 android:maxLines="1"
                 android:ellipsize="end"/>
 
-            <TextView
-                android:id="@+id/song_artist"
+            <!-- Horizontal LinearLayout for micro and artist name -->
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Artist"
-                android:textColor="@color/colorText"
-                android:textSize="10sp"
-                android:gravity="center_horizontal"
-                android:layout_marginTop="2dp"/>
+                android:orientation="horizontal"
+                android:gravity="start|center_vertical"
+                android:layout_marginTop="2dp">
+
+                <ImageView
+                    android:id="@+id/micro_icon"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_micro"
+                    android:layout_gravity="center_vertical"/>
+
+                <TextView
+                    android:id="@+id/song_artist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Artist"
+                    android:textColor="@color/colorText"
+                    android:textSize="12sp"
+                    android:gravity="start|center_vertical"
+                    android:layout_marginStart="2dp" /> <!-- Added margin to separate micro and artist name -->
+
+            </LinearLayout>
 
         </LinearLayout>
 
