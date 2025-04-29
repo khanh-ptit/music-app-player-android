@@ -6,14 +6,18 @@ public class Song {
     private String audio;
     private String singerId;
     private String singerName; // Added singerName field
+    private int position;
+    private int listen;
 
     // Constructor
-    public Song(String title, String avatar, String audio, String singerId, String singerName) {
+    public Song(String title, String avatar, String audio, String singerId, String singerName, int position, int listen) {
         this.title = title;
         this.avatar = avatar;
         this.audio = audio;
         this.singerId = singerId;
         this.singerName = singerName;
+        this.position = position;
+        this.listen = listen;
     }
 
     // Getters and Setters
@@ -55,5 +59,21 @@ public class Song {
 
     public void setSingerName(String singerName) {
         this.singerName = singerName;  // Setter for singerName
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    public int getListen() {
+        return listen;
+    }
+
+    public void setListen(int listen) {
+        this.listen = listen;
     }
 }

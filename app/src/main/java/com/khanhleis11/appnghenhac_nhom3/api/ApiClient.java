@@ -3,11 +3,13 @@ package com.khanhleis11.appnghenhac_nhom3.api;
 import com.khanhleis11.appnghenhac_nhom3.models.SingerResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.SongResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.TopicResponse;
+import com.khanhleis11.appnghenhac_nhom3.models.RankingResponse;  // Import thêm RankingResponse
 
 import retrofit2.Call;
 import retrofit2.http.GET;
 
 public interface ApiClient {
+
     @GET("songs")
     Call<SongResponse> getSongs();  // API call to get the songs
 
@@ -16,4 +18,7 @@ public interface ApiClient {
 
     @GET("topics")
     Call<TopicResponse> getTopics(); // API call to get the topics
+
+    @GET("songs/ranking")  // Add new API endpoint to get ranking songs
+    Call<RankingResponse> getRanking();  // Updated to return RankingResponse instead of SongResponse
 }
