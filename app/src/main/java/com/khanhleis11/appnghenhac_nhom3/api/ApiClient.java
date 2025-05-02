@@ -7,6 +7,7 @@ import com.khanhleis11.appnghenhac_nhom3.models.RankingResponse;  // Import thê
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 
 public interface ApiClient {
 
@@ -21,4 +22,8 @@ public interface ApiClient {
 
     @GET("songs/ranking")  // Add new API endpoint to get ranking songs
     Call<RankingResponse> getRanking();  // Updated to return RankingResponse instead of SongResponse
+
+    @GET("songs/search/{slug}")
+    Call<SongResponse> searchSongs(@Path("slug") String slug);
+
 }

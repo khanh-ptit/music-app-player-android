@@ -13,14 +13,28 @@ import com.khanhleis11.appnghenhac_nhom3.R;
 import com.khanhleis11.appnghenhac_nhom3.models.Song;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder> {
 
     private List<Song> songList;
+    private List<Song> allSongs;  // Store all songs for filtering
 
     public SongAdapter(List<Song> songList) {
         this.songList = songList;
+        this.allSongs = new ArrayList<>(songList);  // Keep a copy of all songs for later filtering
+    }
+
+    // Method to get the full list of songs (useful for filtering)
+    public List<Song> getSongs() {
+        return allSongs;
+    }
+
+    // Method to update the song list with filtered data
+    public void updateList(List<Song> filteredSongs) {
+        this.songList = filteredSongs;
+        notifyDataSetChanged();  // Notify the adapter that the data has changed
     }
 
     @NonNull

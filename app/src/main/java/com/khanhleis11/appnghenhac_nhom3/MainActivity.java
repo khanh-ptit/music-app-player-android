@@ -1,7 +1,11 @@
 package com.khanhleis11.appnghenhac_nhom3;
 
 import android.os.Bundle;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Toast;
+import android.widget.EditText;
+import android.text.TextWatcher;
+import android.text.Editable;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -9,18 +13,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.khanhleis11.appnghenhac_nhom3.adapters.SongAdapter;
 import com.khanhleis11.appnghenhac_nhom3.adapters.SingerAdapter;
-import com.khanhleis11.appnghenhac_nhom3.adapters.TopicAdapter;  // Import thêm TopicAdapter
-import com.khanhleis11.appnghenhac_nhom3.adapters.RankingAdapter;  // Import thêm RankingAdapter
+import com.khanhleis11.appnghenhac_nhom3.adapters.TopicAdapter;
+import com.khanhleis11.appnghenhac_nhom3.adapters.RankingAdapter;
 import com.khanhleis11.appnghenhac_nhom3.models.Song;
 import com.khanhleis11.appnghenhac_nhom3.models.SongResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.Singer;
 import com.khanhleis11.appnghenhac_nhom3.models.SingerResponse;
-import com.khanhleis11.appnghenhac_nhom3.models.Topic;  // Import thêm Topic model
-import com.khanhleis11.appnghenhac_nhom3.models.TopicResponse;  // Import thêm TopicResponse model
-import com.khanhleis11.appnghenhac_nhom3.models.RankingResponse;  // Import thêm RankingResponse model
+import com.khanhleis11.appnghenhac_nhom3.models.Topic;
+import com.khanhleis11.appnghenhac_nhom3.models.TopicResponse;
+import com.khanhleis11.appnghenhac_nhom3.models.RankingResponse;
 import com.khanhleis11.appnghenhac_nhom3.api.ApiClient;
 import com.khanhleis11.appnghenhac_nhom3.api.RetrofitInstance;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -37,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
     private TopicAdapter topicAdapter;  // Declare TopicAdapter
     private RecyclerView rankingListRecycler;  // Declare RecyclerView for ranking songs
     private RankingAdapter rankingAdapter;  // Declare RankingAdapter
+    private EditText searchEditText;  // Declare EditText for search
+
+    private List<Song> allSongs = new ArrayList<>();  // Declare allSongs to store all songs for search
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +67,10 @@ public class MainActivity extends AppCompatActivity {
         rankingListRecycler = findViewById(R.id.ranking_recycler);  // Fixed: Initialize rankingRecycler (use correct ID here)
         rankingListRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));  // Set layout manager for ranking songs
 
-        // Call API to get the song list
+        // Get the search EditText
+        searchEditText = findViewById(R.id.search_edit_text);
+
+        // Setup API client
         ApiClient apiClient = RetrofitInstance.getRetrofitInstance().create(ApiClient.class);
 
         // Get Songs
@@ -69,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<SongResponse> call, Response<SongResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Song> songs = response.body().getSongs();
+                    allSongs = new ArrayList<>(songs);  // Store all songs for searching
                     songAdapter = new SongAdapter(songs);
                     songListRecycler.setAdapter(songAdapter);
                 } else {
@@ -141,5 +153,68 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+
+        // Add text change listener to the search EditText
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                filterSongs(charSequence.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        });
+
+        // Handle the search action when user presses Enter
+        searchEditText.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                // Xử lý sự kiện khi người dùng nhấn Enter (search)
+                String query = searchEditText.getText().toString().trim();
+                filterSongs(query); // Gọi hàm lọc bài hát
+                return true;
+            }
+            return false;
+        });
+    }
+
+    // Method to filter songs based on search query
+    private void filterSongs(String query) {
+        if (query.isEmpty()) {
+            // Nếu tìm kiếm rỗng, trả về tất cả các bài hát đã tải trước đó
+            songAdapter = new SongAdapter(allSongs);
+            songListRecycler.setAdapter(songAdapter);
+        } else {
+            // Gọi API để tìm kiếm bài hát theo slug
+            ApiClient apiClient = RetrofitInstance.getRetrofitInstance().create(ApiClient.class);
+            Call<SongResponse> songCall = apiClient.searchSongs(query);
+            songCall.enqueue(new Callback<SongResponse>() {
+                @Override
+                public void onResponse(Call<SongResponse> call, Response<SongResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<Song> songs = response.body().getSongs();
+                        if (songs != null && !songs.isEmpty()) {
+                            // Hiển thị kết quả tìm kiếm
+                            songAdapter = new SongAdapter(songs);
+                            songListRecycler.setAdapter(songAdapter);
+                        } else {
+                            // Nếu không có kết quả tìm kiếm, hiển thị thông báo
+                            Toast.makeText(MainActivity.this, "Không tìm thấy bài hát", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        // Thông báo lỗi nếu API không trả về kết quả hợp lệ
+                        Toast.makeText(MainActivity.this, "Lỗi khi tải dữ liệu tìm kiếm", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<SongResponse> call, Throwable t) {
+                    // Thông báo lỗi nếu gọi API thất bại
+                    Toast.makeText(MainActivity.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 }
