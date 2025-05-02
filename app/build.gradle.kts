@@ -37,9 +37,12 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-    implementation ("com.squareup.picasso:picasso:2.71828")
+    implementation("com.squareup.picasso:picasso:2.71828")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("androidx.core:core:1.9.0")  // Ensure this is up-to-date
+    implementation("androidx.media:media:1.5.0")
+
 
     // For logging
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")

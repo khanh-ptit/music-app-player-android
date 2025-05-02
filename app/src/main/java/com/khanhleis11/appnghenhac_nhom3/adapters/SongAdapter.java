@@ -1,5 +1,6 @@
 package com.khanhleis11.appnghenhac_nhom3.adapters;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.khanhleis11.appnghenhac_nhom3.R;
 import com.khanhleis11.appnghenhac_nhom3.models.Song;
+import com.khanhleis11.appnghenhac_nhom3.SongPlayActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -20,6 +22,9 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
 
     private List<Song> songList;
     private List<Song> allSongs;  // Store all songs for filtering
+
+    // Listener for song item click
+    private OnItemClickListener onItemClickListener;
 
     public SongAdapter(List<Song> songList) {
         this.songList = songList;
@@ -35,6 +40,11 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
     public void updateList(List<Song> filteredSongs) {
         this.songList = filteredSongs;
         notifyDataSetChanged();  // Notify the adapter that the data has changed
+    }
+
+    // Set the click listener for items
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
     }
 
     @NonNull
@@ -58,6 +68,13 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
 
         // Use Picasso to load the image using HTTPS URL
         Picasso.get().load(avatarUrl).into(holder.songArt);
+
+        // Set click listener on the song item
+        holder.itemView.setOnClickListener(v -> {
+            if (onItemClickListener != null) {
+                onItemClickListener.onItemClick(song);  // Pass the song object when clicked
+            }
+        });
     }
 
     @Override
@@ -76,5 +93,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             songName = itemView.findViewById(R.id.song_name);
             songArtist = itemView.findViewById(R.id.song_artist);
         }
+    }
+
+    // Interface for item click listener
+    public interface OnItemClickListener {
+        void onItemClick(Song song);
     }
 }

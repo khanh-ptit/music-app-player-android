@@ -26,4 +26,6 @@ public interface ApiClient {
     @GET("songs/search/{slug}")
     Call<SongResponse> searchSongs(@Path("slug") String slug);
 
+    @GET("songs/detail/{slug}")
+    Call<SongResponse> getSongDetails(@Path("slug") String slug);
 }

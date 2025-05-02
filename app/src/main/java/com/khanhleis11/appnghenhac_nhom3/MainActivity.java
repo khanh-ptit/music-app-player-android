@@ -1,5 +1,6 @@
 package com.khanhleis11.appnghenhac_nhom3;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Toast;
@@ -60,12 +61,12 @@ public class MainActivity extends AppCompatActivity {
         singerListRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         // Setup RecyclerView for topics
-        topicListRecycler = findViewById(R.id.topic_recycler);  // Initialize topicRecycler
-        topicListRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));  // Set layout manager for topics
+        topicListRecycler = findViewById(R.id.topic_recycler);
+        topicListRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         // Setup RecyclerView for ranking songs
-        rankingListRecycler = findViewById(R.id.ranking_recycler);  // Fixed: Initialize rankingRecycler (use correct ID here)
-        rankingListRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));  // Set layout manager for ranking songs
+        rankingListRecycler = findViewById(R.id.ranking_recycler);
+        rankingListRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         // Get the search EditText
         searchEditText = findViewById(R.id.search_edit_text);
@@ -83,6 +84,17 @@ public class MainActivity extends AppCompatActivity {
                     allSongs = new ArrayList<>(songs);  // Store all songs for searching
                     songAdapter = new SongAdapter(songs);
                     songListRecycler.setAdapter(songAdapter);
+
+                    // Set item click listener after adapter is set
+                    songAdapter.setOnItemClickListener(song -> {
+                        Intent intent = new Intent(MainActivity.this, SongPlayActivity.class);
+                        intent.putExtra("song_title", song.getTitle());
+                        intent.putExtra("song_avatar", song.getAvatar());
+                        intent.putExtra("song_audio", song.getAudio());
+                        intent.putExtra("song_lyrics", song.getLyrics());
+                        intent.putExtra("song_singer", song.getSingerName());
+                        startActivity(intent);
+                    });
                 } else {
                     Toast.makeText(MainActivity.this, "Failed to load songs", Toast.LENGTH_SHORT).show();
                 }
@@ -115,14 +127,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Get Topics
-        Call<TopicResponse> topicCall = apiClient.getTopics();  // Call API for topics
+        Call<TopicResponse> topicCall = apiClient.getTopics();
         topicCall.enqueue(new Callback<TopicResponse>() {
             @Override
             public void onResponse(Call<TopicResponse> call, Response<TopicResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Topic> topics = response.body().getTopics();
-                    topicAdapter = new TopicAdapter(topics);  // Initialize adapter for topics
-                    topicListRecycler.setAdapter(topicAdapter);  // Set adapter for RecyclerView
+                    topicAdapter = new TopicAdapter(topics);
+                    topicListRecycler.setAdapter(topicAdapter);
                 } else {
                     Toast.makeText(MainActivity.this, "Failed to load topics", Toast.LENGTH_SHORT).show();
                 }
@@ -135,14 +147,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Get Ranking Songs
-        Call<RankingResponse> rankingCall = apiClient.getRanking();  // Call API for ranking songs
+        Call<RankingResponse> rankingCall = apiClient.getRanking();
         rankingCall.enqueue(new Callback<RankingResponse>() {
             @Override
             public void onResponse(Call<RankingResponse> call, Response<RankingResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Song> rankingSongs = response.body().getSongs();
-                    rankingAdapter = new RankingAdapter(rankingSongs);  // Initialize adapter for ranking songs
-                    rankingListRecycler.setAdapter(rankingAdapter);  // Set adapter for RecyclerView
+                    rankingAdapter = new RankingAdapter(rankingSongs);
+                    rankingListRecycler.setAdapter(rankingAdapter);
                 } else {
                     Toast.makeText(MainActivity.this, "Failed to load ranking songs", Toast.LENGTH_SHORT).show();
                 }
@@ -157,7 +169,8 @@ public class MainActivity extends AppCompatActivity {
         // Add text change listener to the search EditText
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
@@ -165,13 +178,13 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void afterTextChanged(Editable editable) {}
+            public void afterTextChanged(Editable editable) {
+            }
         });
 
         // Handle the search action when user presses Enter
         searchEditText.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                // Xử lý sự kiện khi người dùng nhấn Enter (search)
                 String query = searchEditText.getText().toString().trim();
                 filterSongs(query); // Gọi hàm lọc bài hát
                 return true;
@@ -183,11 +196,9 @@ public class MainActivity extends AppCompatActivity {
     // Method to filter songs based on search query
     private void filterSongs(String query) {
         if (query.isEmpty()) {
-            // Nếu tìm kiếm rỗng, trả về tất cả các bài hát đã tải trước đó
             songAdapter = new SongAdapter(allSongs);
             songListRecycler.setAdapter(songAdapter);
         } else {
-            // Gọi API để tìm kiếm bài hát theo slug
             ApiClient apiClient = RetrofitInstance.getRetrofitInstance().create(ApiClient.class);
             Call<SongResponse> songCall = apiClient.searchSongs(query);
             songCall.enqueue(new Callback<SongResponse>() {
@@ -196,22 +207,18 @@ public class MainActivity extends AppCompatActivity {
                     if (response.isSuccessful() && response.body() != null) {
                         List<Song> songs = response.body().getSongs();
                         if (songs != null && !songs.isEmpty()) {
-                            // Hiển thị kết quả tìm kiếm
                             songAdapter = new SongAdapter(songs);
                             songListRecycler.setAdapter(songAdapter);
                         } else {
-                            // Nếu không có kết quả tìm kiếm, hiển thị thông báo
                             Toast.makeText(MainActivity.this, "Không tìm thấy bài hát", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        // Thông báo lỗi nếu API không trả về kết quả hợp lệ
                         Toast.makeText(MainActivity.this, "Lỗi khi tải dữ liệu tìm kiếm", Toast.LENGTH_SHORT).show();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<SongResponse> call, Throwable t) {
-                    // Thông báo lỗi nếu gọi API thất bại
                     Toast.makeText(MainActivity.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
