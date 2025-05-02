@@ -1,18 +1,26 @@
 package com.khanhleis11.appnghenhac_nhom3;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.media.audiofx.Visualizer;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.squareup.picasso.Picasso;
+import com.chibde.visualizer.BarVisualizer;
 
 import java.io.IOException;
 
@@ -25,6 +33,8 @@ public class SongPlayActivity extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     private Handler handler = new Handler();
     private Runnable updateSeekBarRunnable;
+    private BarVisualizer visualizer;  // Declare the BarVisualizer
+    private ActivityResultLauncher<String> requestPermissionLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +53,7 @@ public class SongPlayActivity extends AppCompatActivity {
         btnRandom = findViewById(R.id.btn_random);
         btnRepeat = findViewById(R.id.btn_repeat);
         songSingerName = findViewById(R.id.song_singerName); // Add this line
+        visualizer = findViewById(R.id.visualizer);  // Initialize BarVisualizer
 
         // Get song data from intent
         String songTitleText = getIntent().getStringExtra("song_title");
@@ -69,6 +80,8 @@ public class SongPlayActivity extends AppCompatActivity {
             songDuration.setText(formatTime(mediaPlayer.getDuration()));  // Set total song duration
             songSeekBar.setMax(mediaPlayer.getDuration());  // Set SeekBar max value
             handler.post(updateSeekBarRunnable);  // Start updating the SeekBar and current time
+            // Set up BarVisualizer after MediaPlayer is prepared
+            requestAudioPermission();
         });
 
         try {
@@ -103,16 +116,11 @@ public class SongPlayActivity extends AppCompatActivity {
 
         // SeekBar listener to update song position
         songSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
+            @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
+            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
+            @Override public void onStopTrackingTouch(SeekBar seekBar) {
                 mediaPlayer.seekTo(seekBar.getProgress());
             }
-
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
         });
 
         // Handle next, previous, random, and repeat button actions (Not implemented here)
@@ -120,6 +128,21 @@ public class SongPlayActivity extends AppCompatActivity {
         btnPrev.setOnClickListener(v -> Toast.makeText(SongPlayActivity.this, "Previous button clicked", Toast.LENGTH_SHORT).show());
         btnRandom.setOnClickListener(v -> Toast.makeText(SongPlayActivity.this, "Random button clicked", Toast.LENGTH_SHORT).show());
         btnRepeat.setOnClickListener(v -> Toast.makeText(SongPlayActivity.this, "Repeat button clicked", Toast.LENGTH_SHORT).show());
+
+        // Set up permission request launcher
+        requestPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        // Permission is granted. Continue the action or workflow in your app.
+                        setVisualizer();
+                    } else {
+                        // Explain to the user that the feature is unavailable because the
+                        // features requires a permission that the user has denied.
+                        Toast.makeText(this, "Audio permission denied", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
     }
 
     // Format milliseconds to "mm:ss" format
@@ -127,6 +150,39 @@ public class SongPlayActivity extends AppCompatActivity {
         int minutes = (milliseconds / 1000) / 60;
         int seconds = (milliseconds / 1000) % 60;
         return String.format("%02d:%02d", minutes, seconds);
+    }
+
+    // Set up BarVisualizer
+    private void setVisualizer() {
+        if (visualizer != null && mediaPlayer != null) {
+            try {
+                visualizer.release(); // Release old visualizer session if exists
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            int audioSessionId = mediaPlayer.getAudioSessionId();
+            if (audioSessionId != -1) {
+                try {
+                    visualizer.setPlayer(audioSessionId);
+
+                    int color = getResources().getColor(R.color.colorPrimary);  // Set color for visualizer
+                    visualizer.setColor(color);  // Set the color of the visualizer bars
+                } catch (RuntimeException e) {
+                    Log.e("SongPlayActivity", "Error creating Visualizer: " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    private void requestAudioPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            // Permission already granted, initialize Visualizer
+            setVisualizer();
+        } else {
+            // Request permission
+            requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO);
+        }
     }
 
     @Override
@@ -144,5 +200,8 @@ public class SongPlayActivity extends AppCompatActivity {
             mediaPlayer.release();
         }
         handler.removeCallbacks(updateSeekBarRunnable); // Clean up the handler
+        if (visualizer != null) {
+            visualizer.release();
+        }
     }
 }

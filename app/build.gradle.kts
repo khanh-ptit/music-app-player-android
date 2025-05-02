@@ -42,7 +42,8 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("androidx.core:core:1.9.0")  // Ensure this is up-to-date
     implementation("androidx.media:media:1.5.0")
-
+    implementation("com.karumi:dexter:6.2.2")
+    implementation("io.github.gautamchibde:audiovisualizer:2.2.5")
 
     // For logging
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")
