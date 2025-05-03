@@ -7,14 +7,14 @@
 
     <ProgressBar
         android:id="@+id/loading_spinner"
+        style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        style="?android:attr/progressBarStyleLarge"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- ScrollView chứa toàn bộ nội dung có thể cuộn -->
     <androidx.core.widget.NestedScrollView
@@ -22,8 +22,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/mini_player">
+        app:layout_constraintBottom_toTopOf="@id/mini_player"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -32,14 +32,6 @@
             android:paddingBottom="100dp"
             android:scrollbars="vertical">
 
-<!--            <ProgressBar-->
-<!--                android:id="@+id/loading_spinner"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:layout_centerInParent="true"-->
-<!--                android:visibility="gone"-->
-<!--                android:indeterminate="true"/>-->
-
             <!-- Header -->
             <LinearLayout
                 android:id="@+id/header"
@@ -47,9 +39,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@android:color/transparent"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="16dp"
-                android:gravity="center_vertical"
                 android:weightSum="2">
 
                 <!-- Logo và Tiêu đề -->
@@ -215,6 +207,17 @@
             android:textColor="@android:color/white"
             android:textSize="16sp" />
 
+        <!-- Add song_artist TextView -->
+        <TextView
+            android:id="@+id/song_artist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"
+            android:text="Artist Name"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
+
         <TextView
             android:id="@+id/play_pause_button"
             android:layout_width="wrap_content"
@@ -226,6 +229,7 @@
             android:textColor="@android:color/white"
             android:textSize="24sp" />
     </LinearLayout>
+
 
     <!-- Bottom Navigation -->
     <LinearLayout
@@ -244,39 +248,39 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
             android:fontFamily="@font/fa_solid_900"
             android:gravity="center"
+            android:padding="8dp"
             android:text="\uf015"
             android:textColor="@android:color/white"
-            android:textSize="20sp"
-            android:background="?android:attr/selectableItemBackground"
-            android:padding="8dp" />
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/nav_library"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
             android:fontFamily="@font/fa_solid_900"
             android:gravity="center"
+            android:padding="8dp"
             android:text="\uf02d"
             android:textColor="@android:color/white"
-            android:textSize="20sp"
-            android:background="?android:attr/selectableItemBackground"
-            android:padding="8dp" />
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/nav_settings"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
             android:fontFamily="@font/fa_solid_900"
             android:gravity="center"
+            android:padding="8dp"
             android:text="\uf7d9"
             android:textColor="@android:color/white"
-            android:textSize="20sp"
-            android:background="?android:attr/selectableItemBackground"
-            android:padding="8dp" />
+            android:textSize="20sp" />
 
     </LinearLayout>
 

@@ -36,6 +36,11 @@ public class SongPlayActivity extends AppCompatActivity {
     private BarVisualizer visualizer;  // Declare the BarVisualizer
     private ActivityResultLauncher<String> requestPermissionLauncher;
 
+    // Mini Player Views
+    private TextView miniPlayerSongName;
+    private ImageView miniPlayerSongArt;
+    private Button miniPlayerPlayPauseButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +48,7 @@ public class SongPlayActivity extends AppCompatActivity {
 
         // Initialize views
         songTitle = findViewById(R.id.song_title);
-        songArt = findViewById(R.id.song_art);
+        songArt = findViewById(R.id.song_art_main);
         songCurrentTime = findViewById(R.id.song_current_time);
         songDuration = findViewById(R.id.song_duration);
         songSeekBar = findViewById(R.id.song_seekbar);
@@ -52,8 +57,13 @@ public class SongPlayActivity extends AppCompatActivity {
         btnPrev = findViewById(R.id.btn_prev);
         btnRandom = findViewById(R.id.btn_random);
         btnRepeat = findViewById(R.id.btn_repeat);
-        songSingerName = findViewById(R.id.song_singerName); // Add this line
-        visualizer = findViewById(R.id.visualizer);  // Initialize BarVisualizer
+        songSingerName = findViewById(R.id.song_singerName);
+        visualizer = findViewById(R.id.visualizer);
+
+        // Initialize mini player views
+        miniPlayerSongName = findViewById(R.id.song_name);  // song_name from mini player
+        miniPlayerSongArt = findViewById(R.id.song_art_mini);  // song_art_mini from mini player
+        miniPlayerPlayPauseButton = findViewById(R.id.play_pause_button);  // play_pause_button from mini player
 
         // Get song data from intent
         String songTitleText = getIntent().getStringExtra("song_title");
@@ -61,16 +71,34 @@ public class SongPlayActivity extends AppCompatActivity {
         String songAudioUrl = getIntent().getStringExtra("song_audio");
         String songSinger = getIntent().getStringExtra("song_singer");
 
+        // Check if the views are initialized properly
+        if (miniPlayerSongArt == null) {
+            Log.e("SongPlayActivity", "miniPlayerSongArt is null");
+        }
+        if (miniPlayerPlayPauseButton == null) {
+            Log.e("SongPlayActivity", "miniPlayerPlayPauseButton is null");
+        }
+        if (miniPlayerSongName == null) {
+            Log.e("SongPlayActivity", "miniPlayerSongName is null");
+        }
+
         // Set song title and art
         songTitle.setText(songTitleText);
         songSingerName.setText("Ca sĩ: " + songSinger);
+        if (miniPlayerSongName != null) {
+            miniPlayerSongName.setText(songTitleText);  // Set song title for mini player
+        }
 
         // Ensure the URL starts with "https"
         if (songArtUrl != null && songArtUrl.startsWith("http://")) {
             songArtUrl = songArtUrl.replace("http://", "https://");
         }
 
-        Picasso.get().load(songArtUrl).into(songArt);
+        // Picasso - Load image into ImageViews
+        if (songArtUrl != null) {
+            Picasso.get().load(songArtUrl).into(songArt);  // Set song art
+            Picasso.get().load(songArtUrl).into(miniPlayerSongArt);  // Set song art for mini player
+        }
 
         // Initialize MediaPlayer and start playing asynchronously
         mediaPlayer = new MediaPlayer();
@@ -82,6 +110,7 @@ public class SongPlayActivity extends AppCompatActivity {
             handler.post(updateSeekBarRunnable);  // Start updating the SeekBar and current time
             // Set up BarVisualizer after MediaPlayer is prepared
             requestAudioPermission();
+            showMiniPlayer();
         });
 
         try {
@@ -110,6 +139,18 @@ public class SongPlayActivity extends AppCompatActivity {
             } else {
                 mediaPlayer.start();
                 btnPlayPause.setText("\uf04c"); // Pause icon
+                handler.post(updateSeekBarRunnable); // Start updating seek bar
+            }
+        });
+
+        // Mini player Play/Pause functionality
+        miniPlayerPlayPauseButton.setOnClickListener(v -> {
+            if (mediaPlayer.isPlaying()) {
+                mediaPlayer.pause();
+                miniPlayerPlayPauseButton.setText("\uf04b"); // Play icon
+            } else {
+                mediaPlayer.start();
+                miniPlayerPlayPauseButton.setText("\uf04c"); // Pause icon
                 handler.post(updateSeekBarRunnable); // Start updating seek bar
             }
         });
@@ -180,6 +221,16 @@ public class SongPlayActivity extends AppCompatActivity {
         } else {
             requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO);
         }
+    }
+
+    private void showMiniPlayer() {
+        // Ensure that mini player is shown when song starts playing
+        findViewById(R.id.mini_player).setVisibility(View.VISIBLE);
+    }
+
+    private void hideMiniPlayer() {
+        // Hide mini player when there's no song playing
+        findViewById(R.id.mini_player).setVisibility(View.GONE);
     }
 
     @Override
