@@ -165,7 +165,6 @@ public class SongPlayActivity extends AppCompatActivity {
             if (audioSessionId != -1) {
                 try {
                     visualizer.setPlayer(audioSessionId);
-
                     int color = getResources().getColor(R.color.colorPrimary);  // Set color for visualizer
                     visualizer.setColor(color);  // Set the color of the visualizer bars
                 } catch (RuntimeException e) {
@@ -177,10 +176,8 @@ public class SongPlayActivity extends AppCompatActivity {
 
     private void requestAudioPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-            // Permission already granted, initialize Visualizer
             setVisualizer();
         } else {
-            // Request permission
             requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO);
         }
     }

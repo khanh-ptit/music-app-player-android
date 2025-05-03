@@ -40,7 +40,7 @@ public class SingerAdapter extends RecyclerView.Adapter<SingerAdapter.SingerView
         if (avatarUrl != null && avatarUrl.startsWith("http://")) {
             avatarUrl = avatarUrl.replace("http://", "https://");
         }
-        Picasso.get().load(avatarUrl).into(holder.singerAvatar);
+        Picasso.get().load(avatarUrl).resize(200, 200).into(holder.singerAvatar);
     }
 
     @Override

@@ -2,7 +2,9 @@ package com.khanhleis11.appnghenhac_nhom3;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.widget.EditText;
 import android.text.TextWatcher;
@@ -39,53 +41,54 @@ public class MainActivity extends AppCompatActivity {
     private SongAdapter songAdapter;
     private RecyclerView singerListRecycler;
     private SingerAdapter singerAdapter;
-    private RecyclerView topicListRecycler;  // Declare RecyclerView for topics
-    private TopicAdapter topicAdapter;  // Declare TopicAdapter
-    private RecyclerView rankingListRecycler;  // Declare RecyclerView for ranking songs
-    private RankingAdapter rankingAdapter;  // Declare RankingAdapter
-    private EditText searchEditText;  // Declare EditText for search
+    private RecyclerView topicListRecycler;
+    private TopicAdapter topicAdapter;
+    private RecyclerView rankingListRecycler;
+    private RankingAdapter rankingAdapter;
+    private EditText searchEditText;
+    private ProgressBar loadingSpinner;
 
-    private List<Song> allSongs = new ArrayList<>();  // Declare allSongs to store all songs for search
+    private List<Song> allSongs = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Setup RecyclerView for songs
+        // Initialize views
+        loadingSpinner = findViewById(R.id.loading_spinner);
+        searchEditText = findViewById(R.id.search_edit_text);
+
+        // Hiển thị ProgressBar khi bắt đầu fetch
+        loadingSpinner.setVisibility(View.VISIBLE);
+        findViewById(R.id.scroll_view).setVisibility(View.GONE);
+
+        // Setup RecyclerViews
         songListRecycler = findViewById(R.id.song_list_recycler);
         songListRecycler.setLayoutManager(new LinearLayoutManager(this));
 
-        // Setup RecyclerView for singers
         singerListRecycler = findViewById(R.id.singerlist_recycler);
         singerListRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-        // Setup RecyclerView for topics
         topicListRecycler = findViewById(R.id.topic_recycler);
         topicListRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-        // Setup RecyclerView for ranking songs
         rankingListRecycler = findViewById(R.id.ranking_recycler);
         rankingListRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-        // Get the search EditText
-        searchEditText = findViewById(R.id.search_edit_text);
-
-        // Setup API client
         ApiClient apiClient = RetrofitInstance.getRetrofitInstance().create(ApiClient.class);
 
-        // Get Songs
+        // Call API for Songs
         Call<SongResponse> songCall = apiClient.getSongs();
         songCall.enqueue(new Callback<SongResponse>() {
             @Override
             public void onResponse(Call<SongResponse> call, Response<SongResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Song> songs = response.body().getSongs();
-                    allSongs = new ArrayList<>(songs);  // Store all songs for searching
+                    allSongs = new ArrayList<>(songs);
                     songAdapter = new SongAdapter(songs);
                     songListRecycler.setAdapter(songAdapter);
 
-                    // Set item click listener after adapter is set
                     songAdapter.setOnItemClickListener(song -> {
                         Intent intent = new Intent(MainActivity.this, SongPlayActivity.class);
                         intent.putExtra("song_title", song.getTitle());
@@ -95,18 +98,25 @@ public class MainActivity extends AppCompatActivity {
                         intent.putExtra("song_singer", song.getSingerName());
                         startActivity(intent);
                     });
+
                 } else {
                     Toast.makeText(MainActivity.this, "Failed to load songs", Toast.LENGTH_SHORT).show();
                 }
+
+                // Khi load xong bất kể thành công hay thất bại
+                loadingSpinner.setVisibility(View.GONE);
+                findViewById(R.id.scroll_view).setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onFailure(Call<SongResponse> call, Throwable t) {
                 Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                loadingSpinner.setVisibility(View.GONE);
+                findViewById(R.id.scroll_view).setVisibility(View.VISIBLE);
             }
         });
 
-        // Get Singers
+        // Call API for Singers
         Call<SingerResponse> singerCall = apiClient.getSingers();
         singerCall.enqueue(new Callback<SingerResponse>() {
             @Override
@@ -126,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Get Topics
+        // Call API for Topics
         Call<TopicResponse> topicCall = apiClient.getTopics();
         topicCall.enqueue(new Callback<TopicResponse>() {
             @Override
@@ -146,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Get Ranking Songs
+        // Call API for Ranking Songs
         Call<RankingResponse> rankingCall = apiClient.getRanking();
         rankingCall.enqueue(new Callback<RankingResponse>() {
             @Override
@@ -166,34 +176,26 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Add text change listener to the search EditText
+        // Search logic
         searchEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void afterTextChanged(Editable s) {}
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-                filterSongs(charSequence.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterSongs(s.toString());
             }
         });
 
-        // Handle the search action when user presses Enter
         searchEditText.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                String query = searchEditText.getText().toString().trim();
-                filterSongs(query); // Gọi hàm lọc bài hát
+                filterSongs(searchEditText.getText().toString().trim());
                 return true;
             }
             return false;
         });
     }
 
-    // Method to filter songs based on search query
     private void filterSongs(String query) {
         if (query.isEmpty()) {
             songAdapter = new SongAdapter(allSongs);

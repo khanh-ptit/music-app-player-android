@@ -51,7 +51,7 @@ public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.RankingV
         }
 
         // Use Picasso to load the image using HTTPS URL
-        Picasso.get().load(avatarUrl).into(holder.songArt);
+        Picasso.get().load(avatarUrl).resize(200, 200).into(holder.songArt);
     }
 
     @Override

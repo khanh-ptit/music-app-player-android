@@ -5,6 +5,17 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <ProgressBar
+        android:id="@+id/loading_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        style="?android:attr/progressBarStyleLarge"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <!-- ScrollView chứa toàn bộ nội dung có thể cuộn -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scroll_view"
@@ -20,6 +31,14 @@
             android:orientation="vertical"
             android:paddingBottom="100dp"
             android:scrollbars="vertical">
+
+<!--            <ProgressBar-->
+<!--                android:id="@+id/loading_spinner"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_centerInParent="true"-->
+<!--                android:visibility="gone"-->
+<!--                android:indeterminate="true"/>-->
 
             <!-- Header -->
             <LinearLayout

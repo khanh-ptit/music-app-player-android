@@ -67,7 +67,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         }
 
         // Use Picasso to load the image using HTTPS URL
-        Picasso.get().load(avatarUrl).into(holder.songArt);
+        Picasso.get().load(avatarUrl).resize(200, 200).into(holder.songArt);
 
         // Set click listener on the song item
         holder.itemView.setOnClickListener(v -> {

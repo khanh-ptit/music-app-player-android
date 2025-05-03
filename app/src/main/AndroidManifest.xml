@@ -2,12 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Permissions for app -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" android:targetSdkVersion="33"/>
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_AUDIO"
+        android:targetSdkVersion="33" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-
 
     <application
         android:allowBackup="true"
@@ -19,15 +21,23 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppNgheNhacNhom3"
         tools:targetApi="31">
+
+        <!-- SplashActivity: Screen that displays while data is loading -->
+        <activity
+            android:name=".SplashActivity"
+            android:exported="false" />
+
+        <!-- SongPlayActivity: The activity for playing a song -->
         <activity
             android:name=".SongPlayActivity"
             android:exported="false" />
+
+        <!-- MainActivity: The main activity that gets launched -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

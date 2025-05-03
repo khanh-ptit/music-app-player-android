@@ -42,7 +42,7 @@ public class TopicAdapter extends RecyclerView.Adapter<TopicAdapter.TopicViewHol
         }
 
         // Use Picasso to load the topic image
-        Picasso.get().load(avatarUrl).into(holder.topicImage);
+        Picasso.get().load(avatarUrl).resize(200, 200).into(holder.topicImage);
     }
 
     @Override
