@@ -1,9 +1,14 @@
 package com.khanhleis11.appnghenhac_nhom3.api;
 
+import com.khanhleis11.appnghenhac_nhom3.models.ForgotPasswordRequest;
 import com.khanhleis11.appnghenhac_nhom3.models.LoginRequest;
 import com.khanhleis11.appnghenhac_nhom3.models.LoginResponse;
+import com.khanhleis11.appnghenhac_nhom3.models.OtpVerifyRequest;
+import com.khanhleis11.appnghenhac_nhom3.models.OtpVerifyResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.RegisterRequest;
 import com.khanhleis11.appnghenhac_nhom3.models.RegisterResponse;
+import com.khanhleis11.appnghenhac_nhom3.models.ResetPasswordRequest;
+import com.khanhleis11.appnghenhac_nhom3.models.ResetPasswordResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.SingerDetailResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.SingerResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.SongResponse;
@@ -11,6 +16,8 @@ import com.khanhleis11.appnghenhac_nhom3.models.TopicDetailResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.TopicResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.RankingResponse;  // Import thêm RankingResponse
 import com.khanhleis11.appnghenhac_nhom3.models.UserProfileResponse;
+
+import org.json.JSONObject;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -79,4 +86,18 @@ public interface ApiClient {
 
     @GET("/songs/{id}/is-favorite")
     Call<SongResponse> checkIfFavorite(@Path("id") String songId, @Header("Authorization") String token);
+
+    @POST("/user/forgot-password")
+    Call<Void> forgotPassword(@Body ForgotPasswordRequest forgotPasswordRequest);
+
+    @POST("/user/otp-password")
+    Call<OtpVerifyResponse> verifyOtp(@Body OtpVerifyRequest otpVerifyRequest);
+
+    @POST("/user/password/reset")
+    Call<ResetPasswordResponse> resetPassword(
+            @Body ResetPasswordRequest resetPasswordRequest,
+            @Header("Authorization") String token
+    );
+
+
 }

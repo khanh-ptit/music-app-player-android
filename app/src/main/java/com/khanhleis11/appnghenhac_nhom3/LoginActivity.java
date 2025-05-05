@@ -55,6 +55,12 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(intent); // Chuyển đến màn hình đăng ký
         });
 
+        forgetPasswordLink.setOnClickListener(view -> {
+            Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+            startActivity(intent); // Chuyển đến màn hình quên mật khẩu
+        });
+
+
         // Bottom Navigation: Home, Favorite Songs, User Profile
         TextView navHome = findViewById(R.id.nav_home);
         TextView navFavoriteSong = findViewById(R.id.nav_favorite_song);

@@ -45,14 +45,60 @@ public class RegisterActivity extends AppCompatActivity {
             String address = addressEditText.getText().toString().trim();
             String phone = phoneEditText.getText().toString().trim();
 
-            if (fullName.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || address.isEmpty() || phone.isEmpty()) {
-                Toast.makeText(RegisterActivity.this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
-            } else if (!password.equals(confirmPassword)) {
-                Toast.makeText(RegisterActivity.this, "Mật khẩu không khớp!", Toast.LENGTH_SHORT).show();
-            } else {
+            // Validate before sending
+            if (validateInput(fullName, email, password, confirmPassword, address, phone)) {
                 registerUser(fullName, email, password, address, phone);
             }
         });
+    }
+
+    private boolean validateInput(String fullName, String email, String password, String confirmPassword, String address, String phone) {
+        if (fullName.isEmpty()) {
+            fullNameEditText.setError("Vui lòng nhập họ tên");
+            return false;
+        }
+
+        if (email.isEmpty()) {
+            emailEditText.setError("Vui lòng nhập email");
+            return false;
+        }
+
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            emailEditText.setError("Email không hợp lệ");
+            return false;
+        }
+
+        if (password.isEmpty()) {
+            passwordEditText.setError("Vui lòng nhập mật khẩu");
+            return false;
+        }
+
+        if (password.length() < 6) {
+            passwordEditText.setError("Mật khẩu phải có ít nhất 6 ký tự");
+            return false;
+        }
+
+        if (!password.equals(confirmPassword)) {
+            confirmPasswordEditText.setError("Mật khẩu xác nhận không khớp");
+            return false;
+        }
+
+        if (address.isEmpty()) {
+            addressEditText.setError("Vui lòng nhập địa chỉ");
+            return false;
+        }
+
+        if (phone.isEmpty()) {
+            phoneEditText.setError("Vui lòng nhập số điện thoại");
+            return false;
+        }
+
+        if (!phone.matches("^\\d{10,11}$")) {
+            phoneEditText.setError("Số điện thoại không hợp lệ (10-11 số)");
+            return false;
+        }
+
+        return true;
     }
 
     private void registerUser(String fullName, String email, String password, String address, String phone) {
@@ -67,15 +113,12 @@ public class RegisterActivity extends AppCompatActivity {
                 Log.d("RegisterActivity", "Response Code: " + response.code());
 
                 if (response.isSuccessful()) {
-                    // Success case
                     Toast.makeText(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
                     finish(); // Close the Register Activity and return to LoginActivity
                 } else {
-                    // Failure case, check the response code
                     int errorCode = response.code();
                     String errorMessage = "Đăng ký thất bại. Vui lòng thử lại!";
 
-                    // Handle specific error codes
                     if (errorCode == 400) {
                         errorMessage = "Dữ liệu không hợp lệ. Vui lòng kiểm tra lại các thông tin.";
                     } else if (errorCode == 404) {
@@ -84,17 +127,14 @@ public class RegisterActivity extends AppCompatActivity {
                         errorMessage = "Đã xảy ra lỗi từ hệ thống. Vui lòng thử lại sau.";
                     }
 
-                    // Display error message based on error code
                     Toast.makeText(RegisterActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<RegisterResponse> call, Throwable t) {
-                // Error in network or response failure
                 Toast.makeText(RegisterActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
-
 }
