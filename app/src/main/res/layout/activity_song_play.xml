@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
+    android:background="@drawable/bg_gradient"
     android:weightSum="10">
 
     <!-- Nội dung chính -->
@@ -15,6 +16,7 @@
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:paddingTop="16dp"
+        android:background="@android:color/transparent"
         android:paddingBottom="16dp"
         android:scrollbars="vertical">
 
@@ -29,19 +31,21 @@
             android:padding="10dp"
             android:singleLine="true"
             android:text="Song Name"
+            android:background="@android:color/transparent"
             android:textAlignment="center"
-            android:textColor="#000"
+            android:textColor="#ddd"
             android:textSize="22sp" />
 
         <TextView
             android:id="@+id/song_singerName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:text="Singer Name"
+            android:background="@android:color/transparent"
             android:textAlignment="center"
-            android:textColor="#000"
+            android:textColor="#ddd"
+            android:textStyle="italic"
             android:textSize="18sp"
             />
 
@@ -61,6 +65,7 @@
         <!-- Song Progress Bar and Time -->
         <RelativeLayout
             android:layout_width="match_parent"
+            android:background="@android:color/transparent"
             android:layout_height="wrap_content"
             android:paddingBottom="16dp">
 
@@ -69,6 +74,7 @@
                 android:id="@+id/song_seekbar"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="16dp" />
 
@@ -81,6 +87,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_toLeftOf="@id/song_seekbar"
                 android:text="0:00"
+                android:background="@android:color/transparent"
                 android:textColor="#000"
                 android:textSize="14sp" />
 
@@ -91,6 +98,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignTop="@id/song_seekbar"
                 android:layout_marginRight="20dp"
+                android:background="@android:color/transparent"
                 android:layout_toRightOf="@id/song_seekbar"
                 android:text="4:10"
                 android:textColor="#000"
@@ -104,6 +112,7 @@
                 android:layout_below="@id/song_seekbar"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="16dp"
+                android:background="@android:color/transparent"
                 android:orientation="horizontal">
 
                 <!-- Random Button -->
@@ -175,6 +184,7 @@
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:layout_gravity="bottom"
-        android:background="#fff" />
+        android:background="@android:color/transparent"
+        />
 
 </LinearLayout>

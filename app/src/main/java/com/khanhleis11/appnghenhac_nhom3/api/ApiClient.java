@@ -31,4 +31,7 @@ public interface ApiClient {
 
     @GET("songs/next/{currentSongId}")
     Call<SongResponse> getNextSong(@Path("currentSongId") String currentSongId);
+
+    @GET("songs/prev/{currentSongId}")
+    Call<SongResponse> getPrevSong(@Path("currentSongId") String currentSongId);
 }
