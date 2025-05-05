@@ -70,9 +70,7 @@ public class MainActivity extends AppCompatActivity {
         // Mini player views
         miniPlayer = findViewById(R.id.mini_player);
         songArt = findViewById(R.id.song_art);  // Ensure songArt is ImageView
-        playPauseButton = findViewById(R.id.play_pause_button);  // Ensure playPauseButton is TextView
         songName = findViewById(R.id.song_name);  // Ensure songName is TextView
-        songArtist = findViewById(R.id.song_artist);  // Ensure songArtist is TextView
 
         // Hiển thị ProgressBar khi bắt đầu fetch
         loadingSpinner.setVisibility(View.VISIBLE);
@@ -106,13 +104,13 @@ public class MainActivity extends AppCompatActivity {
 
                     songAdapter.setOnItemClickListener(song -> {
                         currentSong = song;  // Set current song
-                        updateMiniPlayer();  // Update mini player with selected song
                         Intent intent = new Intent(MainActivity.this, SongPlayActivity.class);
                         intent.putExtra("song_title", song.getTitle());
                         intent.putExtra("song_avatar", song.getAvatar());
                         intent.putExtra("song_audio", song.getAudio());
                         intent.putExtra("song_lyrics", song.getLyrics());
                         intent.putExtra("song_singer", song.getSingerName());
+                        intent.putExtra("song_id", song.get_id());
                         startActivity(intent);
                     });
 
@@ -241,18 +239,6 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
-        }
-    }
-
-    // Method to update the mini player with the current song's details
-    private void updateMiniPlayer() {
-        if (currentSong != null) {
-            songName.setText(currentSong.getTitle());
-            songArtist.setText(currentSong.getSingerName());
-            Picasso.get().load(currentSong.getAvatar()).into(songArt);
-            miniPlayer.setVisibility(View.VISIBLE);  // Show mini player when a song is selected
-        } else {
-            miniPlayer.setVisibility(View.GONE); // Hide mini player if no song is selected
         }
     }
 }
