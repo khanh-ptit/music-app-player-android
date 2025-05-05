@@ -1,6 +1,7 @@
 package com.khanhleis11.appnghenhac_nhom3;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -19,10 +20,19 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.khanhleis11.appnghenhac_nhom3.models.Song;
+import com.khanhleis11.appnghenhac_nhom3.models.SongResponse;
 import com.squareup.picasso.Picasso;
 import com.chibde.visualizer.BarVisualizer;
+import com.khanhleis11.appnghenhac_nhom3.api.ApiClient;
+import com.khanhleis11.appnghenhac_nhom3.api.RetrofitInstance;
 
 import java.io.IOException;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SongPlayActivity extends AppCompatActivity {
 
@@ -36,10 +46,12 @@ public class SongPlayActivity extends AppCompatActivity {
     private BarVisualizer visualizer;  // Declare the BarVisualizer
     private ActivityResultLauncher<String> requestPermissionLauncher;
 
-    // Mini Player Views
-    private TextView miniPlayerSongName;
-    private ImageView miniPlayerSongArt;
-    private Button miniPlayerPlayPauseButton;
+    private List<Song> songList;  // List of songs
+    private int currentSongIndex = 0;  // Current song index
+
+    // Declare the ObjectAnimator for rotation
+    private ObjectAnimator rotateAnimator;
+    private String songId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +60,7 @@ public class SongPlayActivity extends AppCompatActivity {
 
         // Initialize views
         songTitle = findViewById(R.id.song_title);
-        songArt = findViewById(R.id.song_art_main);
+        songArt = findViewById(R.id.song_art);
         songCurrentTime = findViewById(R.id.song_current_time);
         songDuration = findViewById(R.id.song_duration);
         songSeekBar = findViewById(R.id.song_seekbar);
@@ -57,48 +69,26 @@ public class SongPlayActivity extends AppCompatActivity {
         btnPrev = findViewById(R.id.btn_prev);
         btnRandom = findViewById(R.id.btn_random);
         btnRepeat = findViewById(R.id.btn_repeat);
-        songSingerName = findViewById(R.id.song_singerName);
-        visualizer = findViewById(R.id.visualizer);
-
-        // Initialize mini player views
-        miniPlayerSongName = findViewById(R.id.song_name);  // song_name from mini player
-        miniPlayerSongArt = findViewById(R.id.song_art_mini);  // song_art_mini from mini player
-        miniPlayerPlayPauseButton = findViewById(R.id.play_pause_button);  // play_pause_button from mini player
+        songSingerName = findViewById(R.id.song_singerName); // Add this line
+        visualizer = findViewById(R.id.visualizer);  // Initialize BarVisualizer
 
         // Get song data from intent
         String songTitleText = getIntent().getStringExtra("song_title");
         String songArtUrl = getIntent().getStringExtra("song_avatar");
         String songAudioUrl = getIntent().getStringExtra("song_audio");
         String songSinger = getIntent().getStringExtra("song_singer");
-
-        // Check if the views are initialized properly
-        if (miniPlayerSongArt == null) {
-            Log.e("SongPlayActivity", "miniPlayerSongArt is null");
-        }
-        if (miniPlayerPlayPauseButton == null) {
-            Log.e("SongPlayActivity", "miniPlayerPlayPauseButton is null");
-        }
-        if (miniPlayerSongName == null) {
-            Log.e("SongPlayActivity", "miniPlayerSongName is null");
-        }
+        songId = getIntent().getStringExtra("song_id");
 
         // Set song title and art
         songTitle.setText(songTitleText);
         songSingerName.setText("Ca sĩ: " + songSinger);
-        if (miniPlayerSongName != null) {
-            miniPlayerSongName.setText(songTitleText);  // Set song title for mini player
-        }
 
         // Ensure the URL starts with "https"
         if (songArtUrl != null && songArtUrl.startsWith("http://")) {
             songArtUrl = songArtUrl.replace("http://", "https://");
         }
 
-        // Picasso - Load image into ImageViews
-        if (songArtUrl != null) {
-            Picasso.get().load(songArtUrl).into(songArt);  // Set song art
-            Picasso.get().load(songArtUrl).into(miniPlayerSongArt);  // Set song art for mini player
-        }
+        Picasso.get().load(songArtUrl).into(songArt);
 
         // Initialize MediaPlayer and start playing asynchronously
         mediaPlayer = new MediaPlayer();
@@ -110,7 +100,7 @@ public class SongPlayActivity extends AppCompatActivity {
             handler.post(updateSeekBarRunnable);  // Start updating the SeekBar and current time
             // Set up BarVisualizer after MediaPlayer is prepared
             requestAudioPermission();
-            showMiniPlayer();
+            startRotateAnimation();  // Start rotation animation
         });
 
         try {
@@ -136,22 +126,12 @@ public class SongPlayActivity extends AppCompatActivity {
             if (mediaPlayer.isPlaying()) {
                 mediaPlayer.pause();
                 btnPlayPause.setText("\uf04b"); // Play icon
+                stopRotateAnimation();  // Stop rotation when paused
             } else {
                 mediaPlayer.start();
                 btnPlayPause.setText("\uf04c"); // Pause icon
                 handler.post(updateSeekBarRunnable); // Start updating seek bar
-            }
-        });
-
-        // Mini player Play/Pause functionality
-        miniPlayerPlayPauseButton.setOnClickListener(v -> {
-            if (mediaPlayer.isPlaying()) {
-                mediaPlayer.pause();
-                miniPlayerPlayPauseButton.setText("\uf04b"); // Play icon
-            } else {
-                mediaPlayer.start();
-                miniPlayerPlayPauseButton.setText("\uf04c"); // Pause icon
-                handler.post(updateSeekBarRunnable); // Start updating seek bar
+                startRotateAnimation();  // Start rotation animation when playing
             }
         });
 
@@ -164,11 +144,48 @@ public class SongPlayActivity extends AppCompatActivity {
             }
         });
 
-        // Handle next, previous, random, and repeat button actions (Not implemented here)
-        btnNext.setOnClickListener(v -> Toast.makeText(SongPlayActivity.this, "Next button clicked", Toast.LENGTH_SHORT).show());
-        btnPrev.setOnClickListener(v -> Toast.makeText(SongPlayActivity.this, "Previous button clicked", Toast.LENGTH_SHORT).show());
-        btnRandom.setOnClickListener(v -> Toast.makeText(SongPlayActivity.this, "Random button clicked", Toast.LENGTH_SHORT).show());
-        btnRepeat.setOnClickListener(v -> Toast.makeText(SongPlayActivity.this, "Repeat button clicked", Toast.LENGTH_SHORT).show());
+        // Next button functionality
+        btnNext.setOnClickListener(v -> {
+            // Lấy ID của bài hát hiện tại (currentSongId)
+            String currentSongId = songId;  // Đây là biến songId bạn đã lấy từ dữ liệu bài hát hiện tại
+
+            // Kiểm tra ID của bài hát hiện tại
+            Log.d("SongPlayActivity", "Current Song ID: " + currentSongId);  // In giá trị của currentSongId ra log
+
+            if (currentSongId == null || currentSongId.isEmpty()) {
+                Toast.makeText(SongPlayActivity.this, "ID bài hát không hợp lệ", Toast.LENGTH_SHORT).show();
+                return;  // Dừng lại nếu ID không hợp lệ
+            }
+
+            // Gửi yêu cầu API để lấy bài hát tiếp theo
+            ApiClient apiClient = RetrofitInstance.getRetrofitInstance().create(ApiClient.class);
+            Call<SongResponse> nextSongCall = apiClient.getNextSong(currentSongId);
+
+            nextSongCall.enqueue(new Callback<SongResponse>() {
+                @Override
+                public void onResponse(Call<SongResponse> call, Response<SongResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        // Lấy bài hát tiếp theo từ phản hồi (data trả về trong phần "song")
+                        Song nextSong = response.body().getSong();  // Lấy bài hát tiếp theo
+                        if (nextSong != null) {
+                            // Nếu có bài hát tiếp theo, cập nhật giao diện và phát bài hát
+                            playNextSong(nextSong);
+                        } else {
+                            Toast.makeText(SongPlayActivity.this, "Không thể tải bài hát tiếp theo", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(SongPlayActivity.this, "Không thể tải bài hát tiếp theo", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<SongResponse> call, Throwable t) {
+                    Toast.makeText(SongPlayActivity.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+
+
 
         // Set up permission request launcher
         requestPermissionLauncher = registerForActivityResult(
@@ -184,6 +201,46 @@ public class SongPlayActivity extends AppCompatActivity {
                     }
                 }
         );
+    }
+
+    // Phương thức playNextSong để phát bài hát tiếp theo
+    private void playNextSong(Song nextSong) {
+        // Cập nhật giao diện với bài hát tiếp theo
+        songTitle.setText(nextSong.getTitle());
+        songSingerName.setText("Ca sĩ: " + nextSong.getSingerName());
+        String avatarUrl = nextSong.getAvatar();
+        if (avatarUrl != null && avatarUrl.startsWith("http://")) {
+            avatarUrl = avatarUrl.replace("http://", "https://");
+        }
+        Picasso.get().load(avatarUrl).into(songArt);
+
+        songId = nextSong.get_id();
+
+        // Reset MediaPlayer để phát bài hát tiếp theo
+        mediaPlayer.reset();
+        try {
+            mediaPlayer.setDataSource(nextSong.getAudio());  // Thiết lập nguồn audio của bài hát tiếp theo
+            mediaPlayer.prepareAsync();  // Chuẩn bị bài hát và bắt đầu phát
+        } catch (IOException e) {
+            Toast.makeText(this, "Error loading song", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+
+    // Start rotation animation on song art
+    private void startRotateAnimation() {
+        rotateAnimator = ObjectAnimator.ofFloat(songArt, "rotation", 0f, 360f);
+        rotateAnimator.setDuration(3000);  // Duration of one full rotation (3 seconds)
+        rotateAnimator.setRepeatCount(ObjectAnimator.INFINITE);  // Rotate infinitely
+        rotateAnimator.start();  // Start rotation
+    }
+
+    // Stop rotation animation when song is paused
+    private void stopRotateAnimation() {
+        if (rotateAnimator != null && rotateAnimator.isRunning()) {
+            rotateAnimator.pause();
+        }
     }
 
     // Format milliseconds to "mm:ss" format
@@ -223,21 +280,21 @@ public class SongPlayActivity extends AppCompatActivity {
         }
     }
 
-    private void showMiniPlayer() {
-        // Ensure that mini player is shown when song starts playing
-        findViewById(R.id.mini_player).setVisibility(View.VISIBLE);
+    private String getCurrentSongId() {
+        if (songList != null && !songList.isEmpty()) {
+            Song currentSong = songList.get(currentSongIndex);
+            return currentSong.get_id();  // Trả về ID của bài hát hiện tại
+        }
+        return null;  // Trả về null nếu không có bài hát
     }
 
-    private void hideMiniPlayer() {
-        // Hide mini player when there's no song playing
-        findViewById(R.id.mini_player).setVisibility(View.GONE);
-    }
 
     @Override
     protected void onPause() {
         super.onPause();
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
+            stopRotateAnimation();  // Stop rotation when activity is paused
         }
     }
 
@@ -250,6 +307,9 @@ public class SongPlayActivity extends AppCompatActivity {
         handler.removeCallbacks(updateSeekBarRunnable); // Clean up the handler
         if (visualizer != null) {
             visualizer.release();
+        }
+        if (rotateAnimator != null) {
+            rotateAnimator.cancel();  // Ensure rotation stops when activity is destroyed
         }
     }
 }

@@ -41,12 +41,13 @@
             android:layout_marginBottom="10dp"
             android:text="Singer Name"
             android:textAlignment="center"
-            android:textColor="#888"
-            android:textSize="18sp" />
+            android:textColor="#000"
+            android:textSize="18sp"
+            />
 
         <!-- Song Art -->
         <ImageView
-            android:id="@+id/song_art_main"
+            android:id="@+id/song_art"
             android:layout_width="250dp"
             android:layout_height="250dp"
             android:layout_gravity="center"
@@ -55,7 +56,7 @@
             android:background="@drawable/circular_border"
             android:clipToOutline="true"
             android:outlineProvider="background"
-            android:src="@drawable/ic_home" /> <!-- Hình ảnh của bài hát -->
+            android:src="@drawable/ic_home" /> <!-- Add border radius here -->
 
         <!-- Song Progress Bar and Time -->
         <RelativeLayout
@@ -169,7 +170,6 @@
         </RelativeLayout>
     </LinearLayout>
 
-    <!-- Mini Player Visualization -->
     <com.chibde.visualizer.BarVisualizer
         android:id="@+id/visualizer"
         android:layout_width="match_parent"
@@ -177,29 +177,4 @@
         android:layout_gravity="bottom"
         android:background="#fff" />
 
-    <!-- Mini Player Views -->
-    <TextView
-        android:id="@+id/song_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:padding="10dp"
-        android:text="Song Name"
-        android:textColor="#000"
-        android:textSize="16sp" />
-
-    <ImageView
-        android:id="@+id/song_art_mini"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_gravity="center_vertical"
-        android:background="@android:color/transparent"
-        android:contentDescription="Song Thumbnail" />
-
-    <Button
-        android:id="@+id/play_pause_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:text="Play" />
 </LinearLayout>

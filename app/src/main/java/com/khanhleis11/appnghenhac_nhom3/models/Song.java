@@ -1,6 +1,7 @@
 package com.khanhleis11.appnghenhac_nhom3.models;
 
 public class Song {
+    private String _id;
     private String title;
     private String avatar;
     private String audio;
@@ -20,6 +21,14 @@ public class Song {
         this.position = position;
         this.listen = listen;
         this.lyrics = lyrics;
+    }
+
+    public String get_id() {
+        return _id;
+    }
+
+    public void set_id(String _id) {
+        this._id = _id;
     }
 
     // Getters and Setters
