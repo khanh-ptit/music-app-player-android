@@ -275,7 +275,7 @@ public class SongPlayActivity extends AppCompatActivity {
         // Kiểm tra nếu animator chưa được khởi động lại
         if (rotateAnimator == null || !rotateAnimator.isRunning()) {
             rotateAnimator = ObjectAnimator.ofFloat(songArt, "rotation", 0f, 360f);
-            rotateAnimator.setDuration(3000);  // Duration của một vòng quay
+            rotateAnimator.setDuration(8000);  // Duration của một vòng quay
             rotateAnimator.setRepeatCount(ObjectAnimator.INFINITE);  // Quay liên tục
             rotateAnimator.setRepeatMode(ObjectAnimator.RESTART);  // Quay lại sau mỗi vòng
             rotateAnimator.start();  // Bắt đầu animation

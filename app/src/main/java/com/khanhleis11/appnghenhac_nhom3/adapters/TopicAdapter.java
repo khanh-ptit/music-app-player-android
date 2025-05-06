@@ -1,5 +1,7 @@
 package com.khanhleis11.appnghenhac_nhom3.adapters;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.khanhleis11.appnghenhac_nhom3.R;
+import com.khanhleis11.appnghenhac_nhom3.TopicDetailActivity;
 import com.khanhleis11.appnghenhac_nhom3.models.Topic;
 import com.squareup.picasso.Picasso;
 
@@ -18,15 +21,19 @@ import java.util.List;
 public class TopicAdapter extends RecyclerView.Adapter<TopicAdapter.TopicViewHolder> {
 
     private List<Topic> topicList;
+    private Context context;  // Declare context
 
-    public TopicAdapter(List<Topic> topicList) {
+    // Constructor with context
+    public TopicAdapter(List<Topic> topicList, Context context) {
         this.topicList = topicList;
+        this.context = context;  // Assign context
     }
 
     @NonNull
     @Override
     public TopicViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.topic_item, parent, false);
+        // Use context to inflate the view
+        View view = LayoutInflater.from(context).inflate(R.layout.topic_item, parent, false);
         return new TopicViewHolder(view);
     }
 
@@ -41,8 +48,16 @@ public class TopicAdapter extends RecyclerView.Adapter<TopicAdapter.TopicViewHol
             avatarUrl = avatarUrl.replace("http://", "https://");
         }
 
-        // Use Picasso to load the topic image
+        // Use Picasso to load the topic image with updated HTTPS URL
         Picasso.get().load(avatarUrl).resize(200, 200).into(holder.topicImage);
+
+        // Set click listener to open TopicDetailActivity
+        holder.itemView.setOnClickListener(v -> {
+            // Open TopicDetailActivity when the item is clicked and pass the topic id
+            Intent intent = new Intent(context, TopicDetailActivity.class);
+            intent.putExtra("topic_id", topic.getId()); // Pass the topic id to the intent
+            context.startActivity(intent);
+        });
     }
 
     @Override
