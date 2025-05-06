@@ -140,6 +140,13 @@ public class MainActivity extends AppCompatActivity {
                     List<Singer> singers = response.body().getSingers();
                     singerAdapter = new SingerAdapter(singers);
                     singerListRecycler.setAdapter(singerAdapter);
+
+                    singerAdapter.setOnItemClickListener(singer -> {
+                        // Chuyển đến màn hình chi tiết nghệ sĩ
+                        Intent intent = new Intent(MainActivity.this, SingerDetailActivity.class);
+                        intent.putExtra("singer_id", singer.get_id());  // Gửi singerId qua màn hình chi tiết
+                        startActivity(intent);
+                    });
                 } else {
                     Toast.makeText(MainActivity.this, "Failed to load singers", Toast.LENGTH_SHORT).show();
                 }
