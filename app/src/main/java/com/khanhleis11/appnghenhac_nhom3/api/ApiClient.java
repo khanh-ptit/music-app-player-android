@@ -1,5 +1,6 @@
 package com.khanhleis11.appnghenhac_nhom3.api;
 
+import com.khanhleis11.appnghenhac_nhom3.models.SingerDetailResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.SingerResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.SongResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.TopicDetailResponse;
@@ -38,4 +39,7 @@ public interface ApiClient {
 
     @GET("/topics/{topicId}")
     Call<TopicDetailResponse> getTopicDetails(@Path("topicId") String topicId);
+
+    @GET("/singers/{singerId}")
+    Call<SingerDetailResponse> getSingerDetails(@Path("singerId") String singerId);
 }

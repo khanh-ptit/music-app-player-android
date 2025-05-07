@@ -26,7 +26,7 @@ public class Singer {
     }
 
     // Getters and Setters
-    public String getId() {
+    public String get_id() {
         return _id;
     }
 
