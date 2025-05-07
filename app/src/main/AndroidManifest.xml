@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <!-- Permissions for app -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -21,23 +20,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppNgheNhacNhom3"
         tools:targetApi="31">
-
+        <activity
+            android:name=".TopicDetailActivity"
+            android:exported="false" />
         <!-- SplashActivity: Screen that displays while data is loading -->
         <activity
             android:name=".SplashActivity"
-            android:exported="false" />
-
-        <!-- SongPlayActivity: The activity for playing a song -->
+            android:exported="false" /> <!-- SongPlayActivity: The activity for playing a song -->
         <activity
             android:name=".SongPlayActivity"
-            android:exported="false" />
-
-        <!-- MainActivity: The main activity that gets launched -->
+            android:exported="false" /> <!-- MainActivity: The main activity that gets launched -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

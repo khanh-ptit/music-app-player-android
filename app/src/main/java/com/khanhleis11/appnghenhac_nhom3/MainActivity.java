@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<TopicResponse> call, Response<TopicResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Topic> topics = response.body().getTopics();
-                    topicAdapter = new TopicAdapter(topics);
+                    topicAdapter = new TopicAdapter(topics, MainActivity.this);
                     topicListRecycler.setAdapter(topicAdapter);
                 } else {
                     Toast.makeText(MainActivity.this, "Failed to load topics", Toast.LENGTH_SHORT).show();
