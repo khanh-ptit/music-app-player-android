@@ -185,6 +185,46 @@ public class SongPlayActivity extends AppCompatActivity {
             });
         });
 
+        // Next button functionality
+        btnPrev.setOnClickListener(v -> {
+            // Lấy ID của bài hát hiện tại (currentSongId)
+            String currentSongId = songId;  // Đây là biến songId bạn đã lấy từ dữ liệu bài hát hiện tại
+
+            // Kiểm tra ID của bài hát hiện tại
+            Log.d("SongPlayActivity", "Current Song ID: " + currentSongId);  // In giá trị của currentSongId ra log
+
+            if (currentSongId == null || currentSongId.isEmpty()) {
+                Toast.makeText(SongPlayActivity.this, "ID bài hát không hợp lệ", Toast.LENGTH_SHORT).show();
+                return;  // Dừng lại nếu ID không hợp lệ
+            }
+
+            // Gửi yêu cầu API để lấy bài hát tiếp theo
+            ApiClient apiClient = RetrofitInstance.getRetrofitInstance().create(ApiClient.class);
+            Call<SongResponse> nextSongCall = apiClient.getPrevSong(currentSongId);
+
+            nextSongCall.enqueue(new Callback<SongResponse>() {
+                @Override
+                public void onResponse(Call<SongResponse> call, Response<SongResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        // Lấy bài hát tiếp theo từ phản hồi (data trả về trong phần "song")
+                        Song nextSong = response.body().getSong();  // Lấy bài hát tiếp theo
+                        if (nextSong != null) {
+                            // Nếu có bài hát tiếp theo, cập nhật giao diện và phát bài hát
+                            playNextSong(nextSong);
+                        } else {
+                            Toast.makeText(SongPlayActivity.this, "Không thể tải bài hát tiếp theo", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(SongPlayActivity.this, "Không thể tải bài hát tiếp theo", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<SongResponse> call, Throwable t) {
+                    Toast.makeText(SongPlayActivity.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
 
 
         // Set up permission request launcher
@@ -224,17 +264,24 @@ public class SongPlayActivity extends AppCompatActivity {
         } catch (IOException e) {
             Toast.makeText(this, "Error loading song", Toast.LENGTH_SHORT).show();
         }
-    }
 
+        // Dừng và bắt đầu lại animation xoay
+        startRotateAnimation();
+    }
 
 
     // Start rotation animation on song art
     private void startRotateAnimation() {
-        rotateAnimator = ObjectAnimator.ofFloat(songArt, "rotation", 0f, 360f);
-        rotateAnimator.setDuration(3000);  // Duration of one full rotation (3 seconds)
-        rotateAnimator.setRepeatCount(ObjectAnimator.INFINITE);  // Rotate infinitely
-        rotateAnimator.start();  // Start rotation
+        // Kiểm tra nếu animator chưa được khởi động lại
+        if (rotateAnimator == null || !rotateAnimator.isRunning()) {
+            rotateAnimator = ObjectAnimator.ofFloat(songArt, "rotation", 0f, 360f);
+            rotateAnimator.setDuration(3000);  // Duration của một vòng quay
+            rotateAnimator.setRepeatCount(ObjectAnimator.INFINITE);  // Quay liên tục
+            rotateAnimator.setRepeatMode(ObjectAnimator.RESTART);  // Quay lại sau mỗi vòng
+            rotateAnimator.start();  // Bắt đầu animation
+        }
     }
+
 
     // Stop rotation animation when song is paused
     private void stopRotateAnimation() {
@@ -242,6 +289,7 @@ public class SongPlayActivity extends AppCompatActivity {
             rotateAnimator.pause();
         }
     }
+
 
     // Format milliseconds to "mm:ss" format
     private String formatTime(int milliseconds) {
