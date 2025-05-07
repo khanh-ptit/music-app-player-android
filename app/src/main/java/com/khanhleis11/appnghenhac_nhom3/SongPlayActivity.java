@@ -36,7 +36,7 @@ import retrofit2.Response;
 
 public class SongPlayActivity extends AppCompatActivity {
 
-    private TextView songTitle, songCurrentTime, songDuration, songSingerName;
+    private TextView songTitle, songCurrentTime, songDuration, songSingerName, songHearCount, songLikeCount;
     private ImageView songArt;
     private SeekBar songSeekBar;
     private Button btnPlayPause, btnNext, btnPrev, btnRandom, btnRepeat;
@@ -71,17 +71,24 @@ public class SongPlayActivity extends AppCompatActivity {
         btnRepeat = findViewById(R.id.btn_repeat);
         songSingerName = findViewById(R.id.song_singerName); // Add this line
         visualizer = findViewById(R.id.visualizer);  // Initialize BarVisualizer
+        songHearCount = findViewById(R.id.song_hear_count);
+        songLikeCount = findViewById(R.id.song_like_count);
 
         // Get song data from intent
         String songTitleText = getIntent().getStringExtra("song_title");
+        Log.d("SongPlayActivity", "Song Title: " + songTitleText);
         String songArtUrl = getIntent().getStringExtra("song_avatar");
         String songAudioUrl = getIntent().getStringExtra("song_audio");
         String songSinger = getIntent().getStringExtra("song_singer");
+        String songListen = getIntent().getStringExtra("song_listen");
+        String songLike = getIntent().getStringExtra("song_like");
         songId = getIntent().getStringExtra("song_id");
 
         // Set song title and art
         songTitle.setText(songTitleText);
         songSingerName.setText("Ca sĩ: " + songSinger);
+        songHearCount.setText(songListen + " Lượt nghe");
+        songLikeCount.setText(songLike + " Thích");
 
         // Ensure the URL starts with "https"
         if (songArtUrl != null && songArtUrl.startsWith("http://")) {

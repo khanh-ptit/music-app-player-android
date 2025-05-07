@@ -1,18 +1,21 @@
 package com.khanhleis11.appnghenhac_nhom3.models;
 
+import java.util.List;
+
 public class Song {
     private String _id;
     private String title;
     private String avatar;
     private String audio;
     private String singerId;
-    private String singerName; // Added singerName field
+    private String singerName;
     private int position;
     private int listen;
     private String lyrics;
+    private List<String> like;
 
     // Constructor
-    public Song(String title, String avatar, String audio, String singerId, String singerName, int position, int listen, String lyrics) {
+    public Song(String title, String avatar, String audio, String singerId, String singerName, int position, int listen, String lyrics, List<String> like) {
         this.title = title;
         this.avatar = avatar;
         this.audio = audio;
@@ -21,6 +24,7 @@ public class Song {
         this.position = position;
         this.listen = listen;
         this.lyrics = lyrics;
+        this.like = like;
     }
 
     public String get_id() {
@@ -65,11 +69,11 @@ public class Song {
     }
 
     public String getSingerName() {
-        return singerName;  // Getter for singerName
+        return singerName;
     }
 
     public void setSingerName(String singerName) {
-        this.singerName = singerName;  // Setter for singerName
+        this.singerName = singerName;
     }
 
     public int getPosition() {
@@ -94,5 +98,18 @@ public class Song {
 
     public void setLyrics(String lyrics) {
         this.lyrics = lyrics;
+    }
+
+    public List<String> getLike() {
+        return like; // Getter cho like
+    }
+
+    public void setLike(List<String> like) {
+        this.like = like; // Setter cho like
+    }
+
+    // Phương thức để lấy số lượt like
+    public int getLikeCount() {
+        return like != null ? like.size() : 0; // Trả về số lượng like
     }
 }

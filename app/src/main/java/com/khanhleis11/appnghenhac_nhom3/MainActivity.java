@@ -2,6 +2,7 @@ package com.khanhleis11.appnghenhac_nhom3;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
@@ -111,6 +112,9 @@ public class MainActivity extends AppCompatActivity {
                         intent.putExtra("song_lyrics", song.getLyrics());
                         intent.putExtra("song_singer", song.getSingerName());
                         intent.putExtra("song_id", song.get_id());
+                        intent.putExtra("song_listen", String.valueOf(song.getListen()));
+                        intent.putExtra("song_like", String.valueOf(song.getLikeCount()));
+//                        Log.d("MainActivity", "Song Listen: " + song.getListen());
                         startActivity(intent);
                     });
 
