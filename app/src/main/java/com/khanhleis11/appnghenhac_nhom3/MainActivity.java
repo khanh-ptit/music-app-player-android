@@ -114,7 +114,6 @@ public class MainActivity extends AppCompatActivity {
                         intent.putExtra("song_id", song.get_id());
                         intent.putExtra("song_listen", String.valueOf(song.getListen()));
                         intent.putExtra("song_like", String.valueOf(song.getLikeCount()));
-//                        Log.d("MainActivity", "Song Listen: " + song.getListen());
                         startActivity(intent);
                     });
 
@@ -220,6 +219,46 @@ public class MainActivity extends AppCompatActivity {
             }
             return false;
         });
+
+        // Bottom Navigation: Home, Favorite Songs, User Profile
+        TextView navHome = findViewById(R.id.nav_home);
+        TextView navFavoriteSong = findViewById(R.id.nav_favorite_song);
+        TextView navUser = findViewById(R.id.nav_user);
+
+        navHome.setOnClickListener(v -> {
+//            if (!isLoggedIn()) {
+//                navigateToLogin();
+//            } else {
+//                // Navigate to home screen
+//                startActivity(new Intent(MainActivity.this, HomeActivity.class));
+//            }
+        });
+
+        navFavoriteSong.setOnClickListener(v -> {
+//            if (!isLoggedIn()) {
+//                navigateToLogin();
+//            } else {
+//                // Navigate to favorite songs screen
+//                startActivity(new Intent(MainActivity.this, FavoriteSongsActivity.class));
+//            }
+        });
+
+        navUser.setOnClickListener(v -> {
+            if (!isLoggedIn()) {
+                navigateToLogin();
+            }
+        });
+    }
+
+    private boolean isLoggedIn() {
+        String token = getSharedPreferences("user_prefs", MODE_PRIVATE).getString("user_token", null);
+        return token != null;
+    }
+
+    private void navigateToLogin() {
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(intent);
+        Toast.makeText(MainActivity.this, "Vui lòng đăng nhập trước!", Toast.LENGTH_SHORT).show();
     }
 
     private void filterSongs(String query) {

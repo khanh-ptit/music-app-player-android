@@ -236,7 +236,7 @@
             android:textSize="20sp" />
 
         <TextView
-            android:id="@+id/nav_library"
+            android:id="@+id/nav_favorite_song"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -244,12 +244,12 @@
             android:fontFamily="@font/fa_solid_900"
             android:gravity="center"
             android:padding="8dp"
-            android:text="\uf02d"
+            android:text="\uf004"
             android:textColor="@android:color/white"
             android:textSize="20sp" />
 
         <TextView
-            android:id="@+id/nav_settings"
+            android:id="@+id/nav_user"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -257,7 +257,7 @@
             android:fontFamily="@font/fa_solid_900"
             android:gravity="center"
             android:padding="8dp"
-            android:text="\uf7d9"
+            android:text="\uf007"
             android:textColor="@android:color/white"
             android:textSize="20sp" />
 

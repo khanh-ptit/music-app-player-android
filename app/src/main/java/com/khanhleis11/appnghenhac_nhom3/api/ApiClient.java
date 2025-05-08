@@ -1,5 +1,7 @@
 package com.khanhleis11.appnghenhac_nhom3.api;
 
+import com.khanhleis11.appnghenhac_nhom3.models.LoginRequest;
+import com.khanhleis11.appnghenhac_nhom3.models.LoginResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.SingerDetailResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.SingerResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.SongResponse;
@@ -8,7 +10,10 @@ import com.khanhleis11.appnghenhac_nhom3.models.TopicResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.RankingResponse;  // Import thêm RankingResponse
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.PATCH;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 
 public interface ApiClient {
@@ -42,4 +47,10 @@ public interface ApiClient {
 
     @GET("/singers/{singerId}")
     Call<SingerDetailResponse> getSingerDetails(@Path("singerId") String singerId);
+
+    @PATCH("songs/update-listen/{songId}")
+    Call<SongResponse> updateListen(@Path("songId") String songId);
+
+    @POST("/user/login")
+    Call<LoginResponse> loginUser(@Body LoginRequest loginRequest);
 }

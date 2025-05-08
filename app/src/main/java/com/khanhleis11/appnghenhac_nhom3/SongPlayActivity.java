@@ -69,8 +69,8 @@ public class SongPlayActivity extends AppCompatActivity {
         btnPrev = findViewById(R.id.btn_prev);
         btnRandom = findViewById(R.id.btn_random);
         btnRepeat = findViewById(R.id.btn_repeat);
-        songSingerName = findViewById(R.id.song_singerName); // Add this line
-        visualizer = findViewById(R.id.visualizer);  // Initialize BarVisualizer
+        songSingerName = findViewById(R.id.song_singerName);
+        visualizer = findViewById(R.id.visualizer);
         songHearCount = findViewById(R.id.song_hear_count);
         songLikeCount = findViewById(R.id.song_like_count);
 
@@ -83,6 +83,10 @@ public class SongPlayActivity extends AppCompatActivity {
         String songListen = getIntent().getStringExtra("song_listen");
         String songLike = getIntent().getStringExtra("song_like");
         songId = getIntent().getStringExtra("song_id");
+
+        if (songId != null) {
+            updateListenCount(songId);
+        }
 
         // Set song title and art
         songTitle.setText(songTitleText);
@@ -341,6 +345,34 @@ public class SongPlayActivity extends AppCompatActivity {
             return currentSong.get_id();  // Trả về ID của bài hát hiện tại
         }
         return null;  // Trả về null nếu không có bài hát
+    }
+
+    private void updateListenCount(String songId) {
+        ApiClient apiClient = RetrofitInstance.getRetrofitInstance().create(ApiClient.class);
+        Call<SongResponse> call = apiClient.updateListen(songId);
+
+        call.enqueue(new Callback<SongResponse>() {
+            @Override
+            public void onResponse(Call<SongResponse> call, Response<SongResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    // Lấy song object từ response
+                    Song updatedSong = response.body().getSong();
+
+                    // Cập nhật lại số lượt nghe trên UI
+                    if (updatedSong != null) {
+                        songHearCount.setText(String.valueOf(updatedSong.getListen()));
+                    }
+                } else {
+                    Toast.makeText(SongPlayActivity.this, "Lỗi cập nhật lượt nghe", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SongResponse> call, Throwable t) {
+                Log.e("SongPlayActivity", "Error updating listen count: " + t.getMessage());
+                Toast.makeText(SongPlayActivity.this, "Failed to update listen count", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 
