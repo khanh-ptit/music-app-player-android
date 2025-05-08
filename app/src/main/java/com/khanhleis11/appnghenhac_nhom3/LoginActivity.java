@@ -80,9 +80,17 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(LoginActivity.this, "Đăng nhập thất bại. Vui lòng thử lại!", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    // Log chi tiết nếu response không thành công
+                    int errorCode = response.code();
+                    if (errorCode == 404) {
+                        Toast.makeText(LoginActivity.this, "Email không hợp lệ!", Toast.LENGTH_SHORT).show();
+                    } else if (errorCode == 401) {
+                        Toast.makeText(LoginActivity.this, "Mật khẩu không chính xác!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Các lỗi khác
+                        Toast.makeText(LoginActivity.this, "Đăng nhập thất bại. Vui lòng thử lại!", Toast.LENGTH_SHORT).show();
+                    }
+
                     Log.e("LoginActivity", "Error Response: " + response.errorBody());
-                    Toast.makeText(LoginActivity.this, "Đăng nhập thất bại. Vui lòng thử lại!", Toast.LENGTH_SHORT).show();
                 }
             }
 

@@ -244,21 +244,28 @@ public class MainActivity extends AppCompatActivity {
         });
 
         navUser.setOnClickListener(v -> {
+            // check xem đã đăng nhập chưa bằng cách kiểm tra giá trị trả về của isLoggedIn
+            Log.d("MainActivity", "isLoggedIn: " + isLoggedIn());
+
             if (!isLoggedIn()) {
                 navigateToLogin();
+            } else {
+                // Navigate to user profile screen
+                startActivity(new Intent(MainActivity.this, UserProfileActivity.class));
+
             }
         });
     }
 
     private boolean isLoggedIn() {
-        String token = getSharedPreferences("user_prefs", MODE_PRIVATE).getString("user_token", null);
+        String token = getSharedPreferences("user_prefs", MODE_PRIVATE).getString("auth_token", null);
+        Log.d("MainActivity", "Token retrieved: " + token);
         return token != null;
     }
 
     private void navigateToLogin() {
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(intent);
-        Toast.makeText(MainActivity.this, "Vui lòng đăng nhập trước!", Toast.LENGTH_SHORT).show();
     }
 
     private void filterSongs(String query) {

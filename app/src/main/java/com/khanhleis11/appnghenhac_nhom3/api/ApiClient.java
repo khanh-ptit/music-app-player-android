@@ -8,10 +8,12 @@ import com.khanhleis11.appnghenhac_nhom3.models.SongResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.TopicDetailResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.TopicResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.RankingResponse;  // Import thêm RankingResponse
+import com.khanhleis11.appnghenhac_nhom3.models.UserProfileResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -53,4 +55,7 @@ public interface ApiClient {
 
     @POST("/user/login")
     Call<LoginResponse> loginUser(@Body LoginRequest loginRequest);
+
+    @GET("/user/profile")
+    Call<UserProfileResponse> getUserProfile(@Header("Authorization") String token);
 }
