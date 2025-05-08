@@ -58,4 +58,7 @@ public interface ApiClient {
 
     @GET("/user/profile")
     Call<UserProfileResponse> getUserProfile(@Header("Authorization") String token);
+
+    @GET("/user/favorite-songs")
+    Call<UserProfileResponse> getFavoriteSongs(@Header("Authorization") String token);
 }

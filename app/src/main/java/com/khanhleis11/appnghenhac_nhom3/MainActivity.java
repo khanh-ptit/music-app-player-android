@@ -31,6 +31,7 @@ import com.khanhleis11.appnghenhac_nhom3.models.TopicResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.RankingResponse;
 import com.khanhleis11.appnghenhac_nhom3.api.ApiClient;
 import com.khanhleis11.appnghenhac_nhom3.api.RetrofitInstance;
+import com.khanhleis11.appnghenhac_nhom3.models.UserProfileResponse;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         searchEditText = findViewById(R.id.search_edit_text);
 
         // Mini player views
-        miniPlayer = findViewById(R.id.mini_player);
+//        miniPlayer = findViewById(R.id.mini_player);
         songArt = findViewById(R.id.song_art);  // Ensure songArt is ImageView
         songName = findViewById(R.id.song_name);  // Ensure songName is TextView
 
@@ -235,12 +236,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         navFavoriteSong.setOnClickListener(v -> {
-//            if (!isLoggedIn()) {
-//                navigateToLogin();
-//            } else {
-//                // Navigate to favorite songs screen
-//                startActivity(new Intent(MainActivity.this, FavoriteSongsActivity.class));
-//            }
+            if (isLoggedIn()) {
+                fetchFavoriteSongs();
+            } else {
+                navigateToLogin();
+            }
         });
 
         navUser.setOnClickListener(v -> {
@@ -267,6 +267,39 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(intent);
     }
+
+    private void fetchFavoriteSongs() {
+        String token = getSharedPreferences("user_prefs", MODE_PRIVATE).getString("auth_token", null);
+
+        if (token != null) {
+            ApiClient apiClient = RetrofitInstance.getRetrofitInstance().create(ApiClient.class);
+            Call<UserProfileResponse> call = apiClient.getFavoriteSongs(token);
+
+            call.enqueue(new Callback<UserProfileResponse>() {
+                @Override
+                public void onResponse(Call<UserProfileResponse> call, Response<UserProfileResponse> response) {
+                    if (response.isSuccessful()) {
+                        // Convert List<Song> to ArrayList<Song>
+                        ArrayList<Song> favoriteSongs = new ArrayList<>(response.body().getFavoriteSongs());
+
+                        // Pass the ArrayList to the Intent
+                        Intent intent = new Intent(MainActivity.this, FavoriteSongsActivity.class);
+                        intent.putExtra("favorite_songs", favoriteSongs); // Using putExtra to pass ArrayList
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(MainActivity.this, "Failed to load favorite songs", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<UserProfileResponse> call, Throwable t) {
+                    Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+
 
     private void filterSongs(String query) {
         if (query.isEmpty()) {

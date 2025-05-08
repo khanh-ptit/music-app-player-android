@@ -1,8 +1,9 @@
 package com.khanhleis11.appnghenhac_nhom3.models;
 
 import java.util.List;
+import java.io.Serializable;
 
-public class Song {
+public class Song implements Serializable {
     private String _id;
     private String title;
     private String avatar;
