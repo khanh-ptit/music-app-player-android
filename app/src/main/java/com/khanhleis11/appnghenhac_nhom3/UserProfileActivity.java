@@ -14,8 +14,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.khanhleis11.appnghenhac_nhom3.api.ApiClient;
 import com.khanhleis11.appnghenhac_nhom3.api.RetrofitInstance;
+import com.khanhleis11.appnghenhac_nhom3.models.Song;
 import com.khanhleis11.appnghenhac_nhom3.models.UserProfileResponse;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -69,6 +72,73 @@ public class UserProfileActivity extends AppCompatActivity {
             startActivity(new Intent(UserProfileActivity.this, LoginActivity.class));
             finish();
         });
+
+        // Bottom Navigation: Home, Favorite Songs, User Profile
+        TextView navHome = findViewById(R.id.nav_home);
+        TextView navFavoriteSong = findViewById(R.id.nav_favorite_song);
+        TextView navUser = findViewById(R.id.nav_user);
+
+        navHome.setOnClickListener(v -> {
+            if (!isLoggedIn()) {
+                navigateToLogin();
+            } else {
+                // Navigate to home screen
+                startActivity(new Intent(UserProfileActivity.this, MainActivity.class));
+            }
+        });
+
+        navFavoriteSong.setOnClickListener(v -> {
+            if (isLoggedIn()) {
+                fetchFavoriteSongs();
+            } else {
+                navigateToLogin();
+                Toast.makeText(UserProfileActivity.this, "Vui lòng đăng nhập để xem bài hát yêu thích!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+    }
+
+    private void fetchFavoriteSongs() {
+        String token = getSharedPreferences("user_prefs", MODE_PRIVATE).getString("auth_token", null);
+
+        if (token != null) {
+            ApiClient apiClient = RetrofitInstance.getRetrofitInstance().create(ApiClient.class);
+            Call<UserProfileResponse> call = apiClient.getFavoriteSongs(token);
+
+            call.enqueue(new Callback<UserProfileResponse>() {
+                @Override
+                public void onResponse(Call<UserProfileResponse> call, Response<UserProfileResponse> response) {
+                    if (response.isSuccessful()) {
+                        // Convert List<Song> to ArrayList<Song>
+                        ArrayList<Song> favoriteSongs = new ArrayList<>(response.body().getFavoriteSongs());
+
+                        // Pass the ArrayList to the Intent
+                        Intent intent = new Intent(UserProfileActivity.this, FavoriteSongsActivity.class);
+                        intent.putExtra("favorite_songs", favoriteSongs); // Using putExtra to pass ArrayList
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(UserProfileActivity.this, "Failed to load favorite songs", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<UserProfileResponse> call, Throwable t) {
+                    Toast.makeText(UserProfileActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    private boolean isLoggedIn() {
+        String token = getSharedPreferences("user_prefs", MODE_PRIVATE).getString("auth_token", null);
+        Log.d("MainActivity", "Token retrieved: " + token);
+        return token != null;
+    }
+
+    private void navigateToLogin() {
+        Intent intent = new Intent(UserProfileActivity.this, LoginActivity.class);
+        startActivity(intent);
     }
 
     private void fetchUserProfile(String token) {

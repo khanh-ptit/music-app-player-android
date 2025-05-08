@@ -54,7 +54,6 @@
         android:layout_marginRight="32dp"/>
 
     <!-- Forget Password Link -->
-    <!-- Forget Password Link -->
     <TextView
         android:id="@+id/forget_password_link"
         android:layout_width="wrap_content"

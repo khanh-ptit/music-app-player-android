@@ -240,6 +240,7 @@ public class MainActivity extends AppCompatActivity {
                 fetchFavoriteSongs();
             } else {
                 navigateToLogin();
+                Toast.makeText(MainActivity.this, "Vui lòng đăng nhập để xem bài hát yêu thích!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -249,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (!isLoggedIn()) {
                 navigateToLogin();
+                Toast.makeText(MainActivity.this, "Vui lòng đăng nhập", Toast.LENGTH_SHORT).show();
             } else {
                 // Navigate to user profile screen
                 startActivity(new Intent(MainActivity.this, UserProfileActivity.class));
