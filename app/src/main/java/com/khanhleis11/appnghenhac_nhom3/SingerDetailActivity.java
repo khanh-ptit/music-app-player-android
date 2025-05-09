@@ -2,6 +2,7 @@ package com.khanhleis11.appnghenhac_nhom3;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -18,8 +19,10 @@ import com.khanhleis11.appnghenhac_nhom3.api.ApiClient;
 import com.khanhleis11.appnghenhac_nhom3.api.RetrofitInstance;
 import com.khanhleis11.appnghenhac_nhom3.models.SingerDetailResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.Song;
+import com.khanhleis11.appnghenhac_nhom3.models.UserProfileResponse;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -66,6 +69,80 @@ public class SingerDetailActivity extends AppCompatActivity {
 
         // Load singer details and songs
         loadSingerDetails(singerId);
+
+        // Bottom Navigation: Home, Favorite Songs, User Profile
+        TextView navHome = findViewById(R.id.nav_home);
+        TextView navFavoriteSong = findViewById(R.id.nav_favorite_song);
+        TextView navUser = findViewById(R.id.nav_user);
+
+        navHome.setOnClickListener(v -> {
+            startActivity(new Intent(SingerDetailActivity.this, MainActivity.class));
+        });
+
+        navFavoriteSong.setOnClickListener(v -> {
+            if (isLoggedIn()) {
+                fetchFavoriteSongs();
+            } else {
+                navigateToLogin();
+                Toast.makeText(SingerDetailActivity.this, "Vui lòng đăng nhập để xem bài hát yêu thích!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        navUser.setOnClickListener(v -> {
+            // check xem đã đăng nhập chưa bằng cách kiểm tra giá trị trả về của isLoggedIn
+            Log.d("MainActivity", "isLoggedIn: " + isLoggedIn());
+
+            if (!isLoggedIn()) {
+                navigateToLogin();
+                Toast.makeText(SingerDetailActivity.this, "Vui lòng đăng nhập", Toast.LENGTH_SHORT).show();
+            } else {
+                // Navigate to user profile screen
+                startActivity(new Intent(SingerDetailActivity.this, UserProfileActivity.class));
+
+            }
+        });
+    }
+
+    private boolean isLoggedIn() {
+        String token = getSharedPreferences("user_prefs", MODE_PRIVATE).getString("auth_token", null);
+        Log.d("MainActivity", "Token retrieved: " + token);
+        return token != null;
+    }
+
+    private void navigateToLogin() {
+        Intent intent = new Intent(SingerDetailActivity.this, LoginActivity.class);
+        startActivity(intent);
+    }
+
+    private void fetchFavoriteSongs() {
+        String token = getSharedPreferences("user_prefs", MODE_PRIVATE).getString("auth_token", null);
+
+        if (token != null) {
+            ApiClient apiClient = RetrofitInstance.getRetrofitInstance().create(ApiClient.class);
+            Call<UserProfileResponse> call = apiClient.getFavoriteSongs(token);
+
+            call.enqueue(new Callback<UserProfileResponse>() {
+                @Override
+                public void onResponse(Call<UserProfileResponse> call, Response<UserProfileResponse> response) {
+                    if (response.isSuccessful()) {
+                        // Convert List<Song> to ArrayList<Song>
+                        ArrayList<Song> favoriteSongs = new ArrayList<>(response.body().getFavoriteSongs());
+
+                        // Pass the ArrayList to the Intent
+                        Intent intent = new Intent(SingerDetailActivity.this, FavoriteSongsActivity.class);
+                        intent.putExtra("favorite_songs", favoriteSongs); // Using putExtra to pass ArrayList
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(SingerDetailActivity.this, "Failed to load favorite songs", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<UserProfileResponse> call, Throwable t) {
+                    Toast.makeText(SingerDetailActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     private void loadSingerDetails(String singerId) {

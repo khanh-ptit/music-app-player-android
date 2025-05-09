@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,6 +23,7 @@ import retrofit2.Response;
 public class LoginActivity extends AppCompatActivity {
 
     private EditText emailEditText, passwordEditText;
+    private TextView forgetPasswordLink, registerLink;
     private Button loginButton;
 
     @Override
@@ -33,6 +35,8 @@ public class LoginActivity extends AppCompatActivity {
         emailEditText = findViewById(R.id.email_edit_text);
         passwordEditText = findViewById(R.id.password_edit_text);
         loginButton = findViewById(R.id.login_button);
+        forgetPasswordLink = findViewById(R.id.forget_password_link);
+        registerLink = findViewById(R.id.register_link);
 
         // Set sự kiện cho nút đăng nhập
         loginButton.setOnClickListener(view -> {
@@ -45,6 +49,24 @@ public class LoginActivity extends AppCompatActivity {
                 loginUser(email, password);
             }
         });
+
+//        registerLink.setOnClickListener(view -> {
+//            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+//            startActivity(intent); // Chuyển đến màn hình đăng ký
+//        });
+
+        // Bottom Navigation: Home, Favorite Songs, User Profile
+        TextView navHome = findViewById(R.id.nav_home);
+        TextView navFavoriteSong = findViewById(R.id.nav_favorite_song);
+
+        navHome.setOnClickListener(v -> {
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+        });
+
+        navFavoriteSong.setOnClickListener(v -> {
+            Toast.makeText(LoginActivity.this, "Vui lòng đăng nhập để xem bài hát yêu thích!", Toast.LENGTH_SHORT).show();
+        });
+
     }
 
     private void loginUser(String email, String password) {
