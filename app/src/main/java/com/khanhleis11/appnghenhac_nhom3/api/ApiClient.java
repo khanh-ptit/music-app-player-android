@@ -2,6 +2,8 @@ package com.khanhleis11.appnghenhac_nhom3.api;
 
 import com.khanhleis11.appnghenhac_nhom3.models.LoginRequest;
 import com.khanhleis11.appnghenhac_nhom3.models.LoginResponse;
+import com.khanhleis11.appnghenhac_nhom3.models.RegisterRequest;
+import com.khanhleis11.appnghenhac_nhom3.models.RegisterResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.SingerDetailResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.SingerResponse;
 import com.khanhleis11.appnghenhac_nhom3.models.SongResponse;
@@ -55,6 +57,9 @@ public interface ApiClient {
 
     @POST("/user/login")
     Call<LoginResponse> loginUser(@Body LoginRequest loginRequest);
+
+    @POST("/user/register")  // Add the registerUser API
+    Call<RegisterResponse> registerUser(@Body RegisterRequest registerRequest);
 
     @GET("/user/profile")
     Call<UserProfileResponse> getUserProfile(@Header("Authorization") String token);

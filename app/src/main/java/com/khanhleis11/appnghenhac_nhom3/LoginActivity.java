@@ -50,10 +50,10 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-//        registerLink.setOnClickListener(view -> {
-//            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-//            startActivity(intent); // Chuyển đến màn hình đăng ký
-//        });
+        registerLink.setOnClickListener(view -> {
+            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(intent); // Chuyển đến màn hình đăng ký
+        });
 
         // Bottom Navigation: Home, Favorite Songs, User Profile
         TextView navHome = findViewById(R.id.nav_home);
