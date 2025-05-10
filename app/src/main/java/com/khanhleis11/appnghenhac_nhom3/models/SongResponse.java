@@ -7,7 +7,7 @@ public class SongResponse {
     private String message; // Thêm trường message để lưu trữ thông báo lỗi
     private Song song;
     private String likesCount;
-    private boolean isLiked;  // Sửa thành boolean thay vì String
+    private boolean isLiked, isFavorite;  // Sửa thành boolean thay vì String
 
     public List<Song> getSongs() {
         return songs;
@@ -48,5 +48,13 @@ public class SongResponse {
 
     public void setLiked(boolean liked) {
         isLiked = liked;
+    }
+
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
     }
 }

@@ -71,15 +71,12 @@ public interface ApiClient {
     @PATCH("songs/like/{id}")
     Call<SongResponse> likeSong(@Path("id") String songId, @Header("Authorization") String token);
 
-    @PATCH("songs/unlike/{id}")
-    Call<SongResponse> unlikeSong(@Path("id") String songId, @Header("Authorization") String token);
-
-    @POST("songs/favorite/{id}")
+    @PATCH("songs/favorite/{id}")
     Call<SongResponse> favoriteSong(@Path("id") String songId, @Header("Authorization") String token);
-
-    @DELETE("songs/unfavorite/{id}")
-    Call<SongResponse> unFavoriteSong(@Path("id") String songId, @Header("Authorization") String token);
 
     @GET("/songs/{id}/is-like")
     Call<SongResponse> checkIfLiked(@Path("id") String songId, @Header("Authorization") String token);
+
+    @GET("/songs/{id}/is-favorite")
+    Call<SongResponse> checkIfFavorite(@Path("id") String songId, @Header("Authorization") String token);
 }

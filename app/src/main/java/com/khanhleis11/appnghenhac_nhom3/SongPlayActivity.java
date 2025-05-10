@@ -99,6 +99,7 @@ public class SongPlayActivity extends AppCompatActivity {
         songLikeCount.setText(songLike + " Thích");
 
         checkIfLiked(songId);
+        checkIfFavorite(songId);
 
         // Ensure the URL starts with "https"
         if (songArtUrl != null && songArtUrl.startsWith("http://")) {
@@ -144,6 +145,15 @@ public class SongPlayActivity extends AppCompatActivity {
                 likeOrUnlikeSong();
             } else {
                 Toast.makeText(SongPlayActivity.this, "Vui lòng đăng nhập để thích bài hát!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        btnFavorite.setOnClickListener(v -> {
+            String token = getSharedPreferences("user_prefs", MODE_PRIVATE).getString("auth_token", null);
+            if (token != null) {
+                favoriteSong(songId);
+            } else {
+                Toast.makeText(SongPlayActivity.this, "Vui lòng đăng nhập để trải nghiệm tính năng này!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -466,50 +476,48 @@ public class SongPlayActivity extends AppCompatActivity {
 
 
     // Phương thức thêm bài hát vào yêu thích
-    private void favoriteSong(String songId, String token) {
-        ApiClient apiClient = RetrofitInstance.getRetrofitInstance().create(ApiClient.class);
-        Call<SongResponse> call = apiClient.favoriteSong(songId, "Bearer " + token);
+    private void favoriteSong(String songId) {
+        String token = getSharedPreferences("user_prefs", MODE_PRIVATE).getString("auth_token", null);
+        if (token != null) {
+            ApiClient apiClient = RetrofitInstance.getRetrofitInstance().create(ApiClient.class);
+            Call<SongResponse> call = apiClient.favoriteSong(songId, token);
 
-        call.enqueue(new Callback<SongResponse>() {
-            @Override
-            public void onResponse(Call<SongResponse> call, Response<SongResponse> response) {
-                if (response.isSuccessful()) {
-                    isFavorite = true;  // Đánh dấu là bài hát đã được yêu thích
-                    btnFavorite.setTextColor(ContextCompat.getColor(SongPlayActivity.this, R.color.blue));  // Màu xanh
-                } else {
-                    Toast.makeText(SongPlayActivity.this, "Lỗi khi thêm bài hát vào yêu thích!", Toast.LENGTH_SHORT).show();
+            call.enqueue(new Callback<SongResponse>() {
+                @Override
+                public void onResponse(Call<SongResponse> call, Response<SongResponse> response) {
+                    if (response.isSuccessful()) {
+                        SongResponse songResponse = response.body();
+                        if (songResponse != null) {
+                            // Handle like/unlike status change
+                            String message = songResponse.getMessage();
+                            Toast.makeText(SongPlayActivity.this, message, Toast.LENGTH_SHORT).show();
+
+                            // Update the like button color based on message
+                            if (message.equals("Đã yêu thích bài hát!")) {
+                                isFavorite = true;
+                                btnFavorite.setTextColor(ContextCompat.getColor(SongPlayActivity.this, R.color.red));
+                            } else {
+                                isFavorite = false;
+                                btnFavorite.setTextColor(ContextCompat.getColor(SongPlayActivity.this, R.color.gray));
+                            }
+
+                            updateFavoriteButtonUI();  // Update the UI of the like button
+
+                        }
+                    } else {
+                        Log.e("FavoriteSongError", "Error Code: " + response.code() + " Message favorite: " + response.message());
+                        Toast.makeText(SongPlayActivity.this, "Error toggling favorite song", Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<SongResponse> call, Throwable t) {
-                Toast.makeText(SongPlayActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onFailure(Call<SongResponse> call, Throwable t) {
+                    Toast.makeText(SongPlayActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
-    // Phương thức bỏ bài hát khỏi yêu thích
-    private void unFavoriteSong(String songId, String token) {
-        ApiClient apiClient = RetrofitInstance.getRetrofitInstance().create(ApiClient.class);
-        Call<SongResponse> call = apiClient.unFavoriteSong(songId, "Bearer " + token);
-
-        call.enqueue(new Callback<SongResponse>() {
-            @Override
-            public void onResponse(Call<SongResponse> call, Response<SongResponse> response) {
-                if (response.isSuccessful()) {
-                    isFavorite = false;  // Đánh dấu là bài hát đã bị bỏ yêu thích
-                    btnFavorite.setTextColor(ContextCompat.getColor(SongPlayActivity.this, R.color.gray));  // Màu xám
-                } else {
-                    Toast.makeText(SongPlayActivity.this, "Lỗi khi bỏ bài hát khỏi yêu thích!", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<SongResponse> call, Throwable t) {
-                Toast.makeText(SongPlayActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 
     // Method to check if the song is liked
     private void checkIfLiked(String songId) {
@@ -545,7 +553,39 @@ public class SongPlayActivity extends AppCompatActivity {
         }
     }
 
+    private void checkIfFavorite(String songId) {
+        String token = getSharedPreferences("user_prefs", MODE_PRIVATE).getString("auth_token", null);
+        if (token != null) {
+            ApiClient apiClient = RetrofitInstance.getRetrofitInstance().create(ApiClient.class);
+            Call<SongResponse> call = apiClient.checkIfFavorite(songId, token);
 
+            call.enqueue(new Callback<SongResponse>() {
+                @Override
+                public void onResponse(Call<SongResponse> call, Response<SongResponse> response) {
+                    Log.d("SongPlayActivity", "Response code is favorite: " + response.code());
+                    if (response.isSuccessful()) {
+                        Song song = response.body().getSong();
+                        boolean isFavorite = response.body().isFavorite();  // Use boolean value for isLiked
+                        Log.d("SongPlayActivity", "isFavorite: " + isFavorite);
+                        if (isFavorite) {
+                            isFavorite = true;
+                            btnFavorite.setTextColor(ContextCompat.getColor(SongPlayActivity.this, R.color.red));  // Set to blue if liked
+                        } else {
+                            isFavorite = false;
+                            btnFavorite.setTextColor(ContextCompat.getColor(SongPlayActivity.this, R.color.gray));  // Set to gray if not liked
+                        }
+                    } else {
+                        Toast.makeText(SongPlayActivity.this, "Error checking song like status", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<SongResponse> call, Throwable t) {
+                    Toast.makeText(SongPlayActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
 
     // Update the UI of the like button
     private void updateLikeButtonUI() {
@@ -554,6 +594,15 @@ public class SongPlayActivity extends AppCompatActivity {
         } else {
             Log.d("SongPlayActivity", "isLiked is false");
             btnLike.setTextColor(ContextCompat.getColor(SongPlayActivity.this, R.color.gray));  // Set color to gray when not liked
+        }
+    }
+
+    private void updateFavoriteButtonUI() {
+        if (isFavorite) {
+            btnFavorite.setTextColor(ContextCompat.getColor(SongPlayActivity.this, R.color.red));  // Set color to blue when liked
+        } else {
+            Log.d("SongPlayActivity", "isLiked is false");
+            btnFavorite.setTextColor(ContextCompat.getColor(SongPlayActivity.this, R.color.gray));  // Set color to gray when not liked
         }
     }
 
