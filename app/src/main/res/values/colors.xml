@@ -12,4 +12,6 @@
     <color name="colorOnPrimary">#FFFFFF</color> <!-- Màu trắng cho văn bản trên nền chính -->
 
     <color name="colorText">#000</color> <!-- Màu nền sáng, ví dụ màu trắng -->
+    <color name="blue">#0000FF</color>  <!-- Màu xanh -->
+    <color name="gray">#ddd</color>
 </resources>

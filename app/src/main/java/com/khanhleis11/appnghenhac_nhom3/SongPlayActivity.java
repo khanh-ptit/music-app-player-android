@@ -36,7 +36,7 @@ import retrofit2.Response;
 
 public class SongPlayActivity extends AppCompatActivity {
 
-    private TextView songTitle, songCurrentTime, songDuration, songSingerName, songHearCount, songLikeCount;
+    private TextView songTitle, songCurrentTime, songDuration, songSingerName, songHearCount, songLikeCount, btnLike, btnFavorite;
     private ImageView songArt;
     private SeekBar songSeekBar;
     private Button btnPlayPause, btnNext, btnPrev, btnRandom, btnRepeat;
@@ -52,6 +52,8 @@ public class SongPlayActivity extends AppCompatActivity {
     // Declare the ObjectAnimator for rotation
     private ObjectAnimator rotateAnimator;
     private String songId;
+    private boolean isLiked = false;  // Biến kiểm tra xem bài hát đã được like chưa
+    private boolean isFavorite = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +75,8 @@ public class SongPlayActivity extends AppCompatActivity {
         visualizer = findViewById(R.id.visualizer);
         songHearCount = findViewById(R.id.song_hear_count);
         songLikeCount = findViewById(R.id.song_like_count);
+        btnLike = findViewById(R.id.btn_like);
+        btnFavorite = findViewById(R.id.btn_favorite);
 
         // Get song data from intent
         String songTitleText = getIntent().getStringExtra("song_title");
@@ -93,6 +97,8 @@ public class SongPlayActivity extends AppCompatActivity {
         songSingerName.setText("Ca sĩ: " + songSinger);
         songHearCount.setText(songListen + " Lượt nghe");
         songLikeCount.setText(songLike + " Thích");
+
+        checkIfLiked(songId);
 
         // Ensure the URL starts with "https"
         if (songArtUrl != null && songArtUrl.startsWith("http://")) {
@@ -132,6 +138,15 @@ public class SongPlayActivity extends AppCompatActivity {
             }
         };
 
+        btnLike.setOnClickListener(v -> {
+            String token = getSharedPreferences("user_prefs", MODE_PRIVATE).getString("auth_token", null);
+            if (token != null) {
+                likeOrUnlikeSong();
+            } else {
+                Toast.makeText(SongPlayActivity.this, "Vui lòng đăng nhập để thích bài hát!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         // Play/Pause button functionality
         btnPlayPause.setOnClickListener(v -> {
             if (mediaPlayer.isPlaying()) {
@@ -148,9 +163,16 @@ public class SongPlayActivity extends AppCompatActivity {
 
         // SeekBar listener to update song position
         songSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
-            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
-            @Override public void onStopTrackingTouch(SeekBar seekBar) {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
                 mediaPlayer.seekTo(seekBar.getProgress());
             }
         });
@@ -399,4 +421,140 @@ public class SongPlayActivity extends AppCompatActivity {
             rotateAnimator.cancel();  // Ensure rotation stops when activity is destroyed
         }
     }
+
+
+    // Like/unlike song based on current state
+    private void likeOrUnlikeSong() {
+        String token = getSharedPreferences("user_prefs", MODE_PRIVATE).getString("auth_token", null);
+        if (token != null) {
+            ApiClient apiClient = RetrofitInstance.getRetrofitInstance().create(ApiClient.class);
+            Call<SongResponse> call;
+
+            // Nếu chưa like thì gửi API để like bài hát
+            call = apiClient.likeSong(songId, token);  // Send token directly
+
+            call.enqueue(new Callback<SongResponse>() {
+                @Override
+                public void onResponse(Call<SongResponse> call, Response<SongResponse> response) {
+                    Log.d("SongPlayActivity", "Response code: " + response.code());
+                    if (response.isSuccessful()) {
+                        String message = response.body().getMessage();
+                        if ("Đã thích bài hát".equals(message)) {
+                            // Nếu message trả về là "Đã thích bài hát", bài hát đã được thích
+                            isLiked = true;
+                            Toast.makeText(SongPlayActivity.this, "Bài hát đã được like!", Toast.LENGTH_SHORT).show();
+                        } else if ("Đã bỏ thích bài hát!".equals(message)) {
+                            // Nếu message trả về là "Đã bỏ thích bài hát", bài hát đã bị bỏ thích
+                            isLiked = false;
+                            Toast.makeText(SongPlayActivity.this, "Bài hát đã bị bỏ thích!", Toast.LENGTH_SHORT).show();
+                        }
+
+                        updateLikeButtonUI();  // Update the UI of the like button
+                        songLikeCount.setText(String.valueOf(response.body().getLikesCount()) + " Thích");
+                    } else {
+                        Toast.makeText(SongPlayActivity.this, "Error liking the song", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<SongResponse> call, Throwable t) {
+                    Toast.makeText(SongPlayActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+
+    // Phương thức thêm bài hát vào yêu thích
+    private void favoriteSong(String songId, String token) {
+        ApiClient apiClient = RetrofitInstance.getRetrofitInstance().create(ApiClient.class);
+        Call<SongResponse> call = apiClient.favoriteSong(songId, "Bearer " + token);
+
+        call.enqueue(new Callback<SongResponse>() {
+            @Override
+            public void onResponse(Call<SongResponse> call, Response<SongResponse> response) {
+                if (response.isSuccessful()) {
+                    isFavorite = true;  // Đánh dấu là bài hát đã được yêu thích
+                    btnFavorite.setTextColor(ContextCompat.getColor(SongPlayActivity.this, R.color.blue));  // Màu xanh
+                } else {
+                    Toast.makeText(SongPlayActivity.this, "Lỗi khi thêm bài hát vào yêu thích!", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SongResponse> call, Throwable t) {
+                Toast.makeText(SongPlayActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // Phương thức bỏ bài hát khỏi yêu thích
+    private void unFavoriteSong(String songId, String token) {
+        ApiClient apiClient = RetrofitInstance.getRetrofitInstance().create(ApiClient.class);
+        Call<SongResponse> call = apiClient.unFavoriteSong(songId, "Bearer " + token);
+
+        call.enqueue(new Callback<SongResponse>() {
+            @Override
+            public void onResponse(Call<SongResponse> call, Response<SongResponse> response) {
+                if (response.isSuccessful()) {
+                    isFavorite = false;  // Đánh dấu là bài hát đã bị bỏ yêu thích
+                    btnFavorite.setTextColor(ContextCompat.getColor(SongPlayActivity.this, R.color.gray));  // Màu xám
+                } else {
+                    Toast.makeText(SongPlayActivity.this, "Lỗi khi bỏ bài hát khỏi yêu thích!", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SongResponse> call, Throwable t) {
+                Toast.makeText(SongPlayActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // Method to check if the song is liked
+    private void checkIfLiked(String songId) {
+        String token = getSharedPreferences("user_prefs", MODE_PRIVATE).getString("auth_token", null);
+        if (token != null) {
+            ApiClient apiClient = RetrofitInstance.getRetrofitInstance().create(ApiClient.class);
+            Call<SongResponse> call = apiClient.checkIfLiked(songId, token);
+
+            call.enqueue(new Callback<SongResponse>() {
+                @Override
+                public void onResponse(Call<SongResponse> call, Response<SongResponse> response) {
+                    if (response.isSuccessful()) {
+                        Song song = response.body().getSong();
+                        boolean isLiked = response.body().isLiked();  // Use boolean value for isLiked
+
+                        if (isLiked) {
+                            isLiked = true;
+                            btnLike.setTextColor(ContextCompat.getColor(SongPlayActivity.this, R.color.blue));  // Set to blue if liked
+                        } else {
+                            isLiked = false;
+                            btnLike.setTextColor(ContextCompat.getColor(SongPlayActivity.this, R.color.gray));  // Set to gray if not liked
+                        }
+                    } else {
+                        Toast.makeText(SongPlayActivity.this, "Error checking song like status", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<SongResponse> call, Throwable t) {
+                    Toast.makeText(SongPlayActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+
+
+    // Update the UI of the like button
+    private void updateLikeButtonUI() {
+        if (isLiked) {
+            btnLike.setTextColor(ContextCompat.getColor(SongPlayActivity.this, R.color.blue));  // Set color to blue when liked
+        } else {
+            Log.d("SongPlayActivity", "isLiked is false");
+            btnLike.setTextColor(ContextCompat.getColor(SongPlayActivity.this, R.color.gray));  // Set color to gray when not liked
+        }
+    }
+
 }

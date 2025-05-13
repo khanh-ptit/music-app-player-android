@@ -14,6 +14,7 @@ import com.khanhleis11.appnghenhac_nhom3.models.UserProfileResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.PATCH;
@@ -66,4 +67,19 @@ public interface ApiClient {
 
     @GET("/user/favorite-songs")
     Call<UserProfileResponse> getFavoriteSongs(@Header("Authorization") String token);
+
+    @PATCH("songs/like/{id}")
+    Call<SongResponse> likeSong(@Path("id") String songId, @Header("Authorization") String token);
+
+    @PATCH("songs/unlike/{id}")
+    Call<SongResponse> unlikeSong(@Path("id") String songId, @Header("Authorization") String token);
+
+    @POST("songs/favorite/{id}")
+    Call<SongResponse> favoriteSong(@Path("id") String songId, @Header("Authorization") String token);
+
+    @DELETE("songs/unfavorite/{id}")
+    Call<SongResponse> unFavoriteSong(@Path("id") String songId, @Header("Authorization") String token);
+
+    @GET("/songs/{id}/is-like")
+    Call<SongResponse> checkIfLiked(@Path("id") String songId, @Header("Authorization") String token);
 }
